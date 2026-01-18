@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PBX-0008 NCLEX-RN</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PBX-0008">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<style>
+/* ... (Your existing CSS remains the same) ... */
+*{ box-sizing:border-box; }
+body{ margin:0; font-family: Arial, Helvetica, sans-serif; background:#eef3f8; overflow:hidden; }
+:root{ --navy: #005b96; --navy-light: #5086b3; --google-blue: #1a73e8; --calc-red: #8b0000; --calc-blue: #004080; --glass: rgba(255, 255, 255, 0.8); }
+.topbar{ height:44px; background:var(--navy); color:white; padding:0 16px; display:flex; justify-content:space-between; align-items:center; font-size:14px; }
+.top-left{ font-weight:bold; display: flex; align-items: center; gap: 10px;}
+@keyframes metalGlare { 0% { color: white; text-shadow: 0 0 5px rgba(255, 255, 255, 0.3); } 25% { color: #FFD700; text-shadow: 0 0 15px rgba(255, 255, 0, 0.8), 0 0 30px rgba(255, 255, 0, 0.6); } 50% { color: white; text-shadow: 0 0 20px rgba(255, 255, 255, 0.9), 0 0 80px rgba(255, 255, 255, 0.7); } 75% { color: #FFD700; text-shadow: 0 0 150px rgba(255, 255, 0, 0.8), 0 0 300px rgba(255, 255, 0, 0.6); } 100% { color: white; text-shadow: 0 0 5px rgba(255, 255, 255, 0.3); } }
+.top-left.glare-active { animation: metalGlare 6s ease-in-out infinite; }
+@keyframes glarYellowRed { 0% { color: inherit; text-shadow: 0 0 2px rgba(255, 255, 0, 0.3); } 25% { color: #FFD700; text-shadow: 0 0 10px rgba(255, 255, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.6), inset 0 0 8px rgba(255, 255, 0, 0.4); } 50% { color: #FFA500; text-shadow: 0 0 15px rgba(255, 165, 0, 0.8), 0 0 25px rgba(255, 140, 0, 0.6), inset 0 0 10px rgba(255, 140, 0, 0.4); } 75% { color: #f8a98c; text-shadow: 0 0 15px rgba(255, 69, 0, 0.8), 0 0 25px rgba(255, 114, 142, 0.644), inset 0 0 10px rgb(255, 112, 112); } 100% { color: inherit; text-shadow: 0 0 2px rgba(255, 94, 94, 0.555); } }
+.pbx-glare { animation: glarYellowRed 3s ease-in-out infinite; font-weight: bold; display: inline-block; }
+.top-center{ position: absolute; left: 50%; transform: translateX(-50%); color: white; font-weight: bold; font-size: 14px; }
+#typewriter { color: white; font-weight: normal; border-right: 2px solid rgba(255,255,255,0.75); white-space: nowrap; overflow: hidden; padding-left: 10px; border-left: 1px solid rgba(255,255,255,0.3); min-width: 120px; }
+.cursor-blink { animation: blink 0.7s infinite; }
+@keyframes blink { 50% { border-color: transparent; } }
+.top-right span{ font-weight:bold; cursor:pointer; margin-left:10px; }
+.calc-strip{ height:36px; background:var(--navy-light); color:white; padding:0 16px; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; font-size:13px; }
+.calc-left{ cursor:pointer; font-weight:bold; }
+.calc-center{ text-align:center; font-weight:bold; }
+.calc-right{ text-align:right; }
+#caseStudyContainer { margin-bottom: 20px; border-bottom: 4px solid #eef3f8; padding: 15px; display: none; font-size: 16px; line-height: 1.8; color: #333; font-weight: 500; }
+.nav-tabs { display: flex; flex-wrap: wrap; padding-left: 0; margin-bottom: 0; list-style: none; border-bottom: 1px solid #dee2e6; }
+.nav-item { margin-bottom: -1px; }
+.nav-link { display: block; padding: 8px 16px; border: 1px solid transparent; border-top-left-radius: 4px; border-top-right-radius: 4px; text-decoration: none; color: var(--navy); background-color: #f8f9fa; cursor: pointer; font-size: 13px; font-weight: bold; margin-right: 2px; }
+.nav-link.active { color: #495057; background-color: #fff; border-color: #dee2e6 #dee2e6 #fff; }
+.tab-content { padding: 15px; border: 1px solid #dee2e6; border-top: none; font-size: 16px; line-height: 1.8; }
+.tab-pane { display: none; }
+.tab-pane.active { display: block; animation: fadeIn 0.3s; }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+table { border-collapse: collapse; width: 100%; font-size: 13px; margin: 10px 0; }
+th, td { border: 1px solid #dee2e6; padding: 8px; text-align: left; }
+th { background-color: #f1f3f5; }
+select.ngn-select { padding: 5px; border: 1px solid var(--navy); border-radius: 4px; background: #eef; font-weight: bold; max-width: 100%; }
+.main{ height:calc(100vh - 44px - 36px - 44px); display:grid; grid-template-columns:1fr 1fr; }
+.left, .right{ overflow-y:auto; overflow-x:hidden; padding:24px; }
+.left{ background:white; border-right:1px solid #bacada; }
+.right{ background:#f8fafc; }
+.left img, .right img { max-width: 100%; height: auto; display: block; margin: 15px 0; border-radius: 4px; background: linear-gradient(135deg, rgb(0, 0, 0) 0%, rgb(0, 0, 0) 100%); backdrop-filter: blur(10px); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3), 0 8px 15px rgba(0, 0, 0, 0.2), 0 12px 20px rgba(0, 0, 0, 0.1); }
+.blue-search { color: var(--google-blue); text-decoration: underline; cursor: pointer; font-weight: 600; }
+.option { border: none !important; padding: 14px 14px 14px 45px; margin-bottom: 0; cursor: pointer; position: relative; border-radius: 4px; background: linear-gradient(135deg, rgb(255, 255, 255) 0%, rgb(255, 255, 255) 100%); backdrop-filter: blur(10px); box-shadow: inset 1px 1px 2px rgb(255, 255, 255), 0 4px 6px rgb(255, 255, 255); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+.option::before { content: ""; width: 16px; height: 16px; border: 1.5px solid #000000; border-radius: 15%; position: absolute; left: 25px; top: 50%; transform: translateY(-50%); }
+.option.selected { background: rgba(255, 255, 255, 0.15) !important; }
+.option.selected::before { background: var(--navy); border-color: var(--navy); }
+.option.correct::before { content: "✓"; position: absolute; right: 15px; font-size: 20px; color: #1bad22; font-weight: bold; }
+.option.wrong::before { content: "✗"; position: absolute; right: 15px; font-size: 20px; color: #ff2828; font-weight: bold; }
+#questionResultBox { display: none; background: #ffffff; border: 1px solid #ffffff; border-left: 8px solid #ffffff; margin-top: 20px; padding: 4px; font-size: 11px; color: #000000; box-shadow: 1px 1px 50px rgba(0, 0, 0, 0.315); }
+.result-flex { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 5px !important; align-items: center !important; text-align: center !important; }
+.result-item { padding: 8px !important; }
+#aiModal { position: fixed; top: 60px; right: -550px; width: 500px; height: 80%; background: var(--glass); backdrop-filter: blur(20px); border-radius: 15px 0 0 15px; box-shadow: -10px 0 30px rgba(0,0,0,0.2); z-index: 20000; transition: right 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; flex-direction: column; border: 1px solid rgba(255,255,255,0.3); }
+#aiModal.active { right: 0; }
+.ai-header { padding: 15px; background: var(--navy); color: white; display: flex; justify-content: space-between; border-radius: 15px 0 0 0; font-weight: bold; }
+.ai-body { flex: 1; position: relative; }
+.ai-body iframe { width: 100%; height: 100%; border: none; }
+.ai-loader { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none; text-align: center; }
+.spinner { border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid var(--navy); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 10px; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+.bottombar{ height:44px; background:var(--navy); padding:0 16px; display:flex; justify-content:flex-end; align-items:center; }
+.bottombar button, .check-btn button{ background:var(--navy-light); color:white; border:none; width:120px; padding:8px 0; margin-left:10px; cursor:pointer; font-weight:bold; text-align: center; }
+.check-btn { margin-top: 15px; }
+#calculator { position: fixed; top: 150px; left: 100px; background: #333; width: 230px; border-radius: 15px; box-shadow: 0 12px 40px rgba(0,0,0,0.4); display: none; z-index: 10000; padding-bottom: 12px; }
+#calc-header { background: var(--navy); color: white; padding: 12px; cursor: move; display: flex; justify-content: space-between; border-radius: 15px 15px 0 0; }
+#calc-display { width: 90%; margin: 12px auto; display: block; height: 45px; text-align: right; padding: 10px; font-size: 20px; border: none; background: #f4f4f4; border-radius: 8px; }
+.calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 0 12px; }
+.calc-btn { padding: 12px 0; border: none; background: #555; color: white; border-radius: 8px; cursor: pointer; }
+.calc-btn.op { background: var(--calc-red); } 
+.calc-btn.eq { background: var(--calc-blue); grid-column: span 2; } 
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+  <div class="top-left">
+    <span class="pbx-glare">PBX-0008</span> NCLEX-RN
+    <div id="typewriter" class="cursor-blink"></div>
+  </div>
+  <div class="top-center" id="qidDisplay">QID. ----</div>
+  <div class="top-right">
+    <span id="scoreBox" onclick="toggleScore()">Score: 0 / 0 (0%)</span>
+    <span id="timeBox" onclick="toggleTime()">Time: 00:00</span>
+  </div>
+</div>
+
+<div id="aiModal">
+  <div class="ai-header">
+    <span>✨<span class="pbx-glare">PBX-0008</span> Assistant</span>
+    <span onclick="closeAI()" style="cursor:pointer">✖</span>
+  </div>
+  <div class="ai-body">
+    <div id="aiLoader" class="ai-loader">
+      <div class="spinner"></div>
+      <p>Consulting <span class="pbx-glare">PBX-0008</span> AI...</p>
+    </div>
+    <iframe id="aiFrame" src=""></iframe>
+  </div>
+</div>
+
+<div class="calc-strip">
+  <div class="calc-left" onclick="openCalc()">Calculator</div>
+  <div class="calc-center" id="fileName"><span class="pbx-glare">PBX-0008</span></div>
+  <div class="calc-right" id="rightStrip">
+    <input type="file" accept=".txt,.json" onchange="loadFile(event)">
+  </div>
+</div>
+
+<div class="main">
+  <div class="left">
+    <div id="caseStudyContainer"></div>
+    <div class="qtext" id="question">Loading...</div>
+    <div id="options"></div>
+    <div class="check-btn"><button onclick="check()">Check</button></div>
+    <div id="questionResultBox">
+        <div class="result-flex">
+            <div class="result-item"><b id="ind-score">0 / 0</b>SCORED / MAX</div>
+            <div class="result-item"><b id="ind-scoring-rule">0/1</b>SCORING RULE</div>
+            <div class="result-item"><b id="ind-time">00:00</b>TIME SPENT</div>
+            <div class="result-item"><b id="ind-avg-time">00:00</b>OTHERS AVG</div>
+            <div class="result-item"><b id="ind-subject">General</b>SUBJECT</div>
+            <div class="result-item"><b id="ind-topic">General</b>TOPIC</div>
+        </div>
+    </div>
+  </div>
+  <div class="right">
+    <div id="explanation">Explanation will appear here.</div>
+  </div>
+</div>
+
+<div class="bottombar">
+  <button onclick="prevQ()">◀ Previous</button>
+  <button onclick="nextQ()">Next ▶</button>
+</div>
+
+<div id="calculator">
+  <div id="calc-header"><span>PBX Calculator</span><span onclick="closeCalc()" style="cursor:pointer">✖</span></div>
+  <input type="text" id="calc-display" disabled value="0">
+  <div class="calc-grid">
+    <button class="calc-btn" onclick="calcClear()">C</button>
+    <button class="calc-btn op" onclick="calcIn('/')">/</button>
+    <button class="calc-btn op" onclick="calcIn('*')">*</button>
+    <button class="calc-btn op" onclick="calcIn('-')">-</button>
+    <button class="calc-btn" onclick="calcIn('7')">7</button>
+    <button class="calc-btn" onclick="calcIn('8')">8</button>
+    <button class="calc-btn" onclick="calcIn('9')">9</button>
+    <button class="calc-btn op" onclick="calcIn('+')">+</button>
+    <button class="calc-btn" onclick="calcIn('4')">4</button>
+    <button class="calc-btn" onclick="calcIn('5')">5</button>
+    <button class="calc-btn" onclick="calcIn('6')">6</button>
+    <button class="calc-btn" onclick="calcIn('.')">.</button>
+    <button class="calc-btn" onclick="calcIn('1')">1</button>
+    <button class="calc-btn" onclick="calcIn('2')">2</button>
+    <button class="calc-btn" onclick="calcIn('3')">3</button>
+    <button class="calc-btn" onclick="calcIn('0')">0</button>
+    <button class="calc-btn eq" onclick="calcRes()">=</button>
+  </div>
+</div>
+
+<script>
+/* (All of your existing JavaScript logic remains here) */
+let DATA={questionList:[]};
+let qIndex=0, selected=[], score=0, total=0, sec=0;
+let timer=null, questionsLoaded=false;
+let showScore=true, showTime=true;
+
+const terms = ["Loading...PBX-0008 Core...", "ਦਿਲ ਦਾ ਨੀ ਮਾੜਾ...", "ਦਬੀ ਨਾ ਤੂੰ ਦੁਨੀਆ ਸਵਾਦ ਲੈਂਦੀ ਏ...", "PBX-0008 is AI-Powered", "made Nursing Simple & Easy", "Helps in Achieving Goals", "All in One= PBX-0008", "Advanced PBX-0008 Search Engine", "designed by- J.SINGH"];
+const termsHtml = ["Loading...<span class='pbx-glare'>PBX-0008</span> Core...", "ਦਿਲ ਦਾ ਨੀ ਮਾੜਾ...", "ਦਬੀ ਨਾ ਤੂੰ ਦੁਨੀਆ ਸਵਾਦ ਲੈਂਦੀ ਏ...", "<span class='pbx-glare'>PBX-0008</span> is AI-Powered", "made Nursing Simple & Easy", "Helps in Achieving Goals", "All in One= <span class='pbx-glare'>PBX-0008</span>", "Advanced <span class='pbx-glare'>PBX-0008</span> Search Engine", "designed by- J.SINGH"];
+const twElement = document.getElementById("typewriter");
+let termIndex = 0, charIndex = 0, isDeleting = false;
+
+function typeEffect() {
+  if (questionsLoaded) { twElement.style.display = "none"; return; }
+  const currentTerm = terms[termIndex];
+  const currentTermHtml = termsHtml[termIndex];
+  if (isDeleting) {
+    const truncated = currentTerm.substring(0, charIndex - 1);
+    twElement.innerHTML = currentTermHtml.substring(0, currentTermHtml.indexOf(currentTerm) + truncated.length);
+    charIndex--;
+  } else {
+    const truncated = currentTerm.substring(0, charIndex + 1);
+    twElement.innerHTML = currentTermHtml.substring(0, currentTermHtml.indexOf(currentTerm) + truncated.length);
+    charIndex++;
+  }
+  let typeSpeed = isDeleting ? 40 : 60;
+  if (!isDeleting && charIndex === currentTerm.length) {
+    typeSpeed = 2000;
+    isDeleting = true;
+  } else if (isDeleting && charIndex === 0) {
+    isDeleting = false;
+    termIndex = (termIndex + 1) % terms.length;
+    typeSpeed = 1000;
+  }
+  setTimeout(typeEffect, typeSpeed);
+}
+typeEffect();
+
+function aiSearch(term) {
+  const modal = document.getElementById("aiModal");
+  const loader = document.getElementById("aiLoader");
+  const frame = document.getElementById("aiFrame");
+  modal.classList.add("active");
+  loader.style.display = "block";
+  frame.style.opacity = "0";
+  const prompt = `according to NCLEX-RN define ${term} and tell me 5 key points about ${term} in short whole output within 10 lines or minimal`;
+  frame.src = `https://www.google.com/search?q=${encodeURIComponent(prompt)}&igu=1`;
+  frame.onload = () => { loader.style.display = "none"; frame.style.opacity = "1"; };
+}
+function closeAI() { document.getElementById("aiModal").classList.remove("active"); }
+
+function clean(t){ return t ?? ""; }
+function formatExplanation(t){
+  if(!t) return "";
+  let text = t.replace(/\((Option|Options)[^)]+\)/gi, m => `<span class="opt-gap"><b>${m}</b></span>`);
+  text = text.replace(/<a[^>]*>(.*?)<\/a>/gi, (match, p1) => { return `<span class="blue-search" onclick="aiSearch('${p1}')">${p1}</span>`; });
+  return text;
+}
+
+function startTimer(){ if(timer || !questionsLoaded) return; timer=setInterval(()=>{ 
+    sec++; 
+    if(DATA.questionList[qIndex] && !DATA.questionList[qIndex].submitted) {
+        DATA.questionList[qIndex].timeTaken = (DATA.questionList[qIndex].timeTaken || 0) + 1;
+    }
+    updateTopBar(); 
+},1000); }
+
+function updateTopBar(){
+  let p=total?Math.round((score/total)*100):0;
+  let m=String(Math.floor(sec/60)).padStart(2,'0');
+  let s=String(sec%60).padStart(2,'0');
+  scoreBox.innerText=showScore?`Score: ${score} / ${total} (${p}%)`:"Score: —";
+  timeBox.innerText=showTime?`Time: ${m}:${s}`:"Time: —";
+}
+
+function toggleScore(){ showScore=!showScore; updateTopBar(); }
+function toggleTime(){ showTime=!showTime; updateTopBar(); }
+
+function initTabs(container) {
+  const links = container.querySelectorAll('.nav-link');
+  links.forEach(link => {
+    link.onclick = (e) => {
+      e.preventDefault();
+      container.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      container.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      link.classList.add('active');
+      const targetId = link.getAttribute('data-target').replace('#', '');
+      const target = container.querySelector(`#${targetId}`);
+      if(target) target.classList.add('active');
+    }
+  });
+}
+
+function render(){
+  if(!DATA.questionList.length) return;
+  const q=DATA.questionList[qIndex];
+  selected=q.userAnswer||[];
+  rightStrip.innerText=`Question ${qIndex+1} of ${DATA.questionList.length}`;
+  document.getElementById("qidDisplay").innerText = `QID. ${q.questionId || "----"}`;
+  const csBox = document.getElementById("caseStudyContainer");
+  if(q.abstractId > 0 && DATA.abstractList) {
+      const abs = DATA.abstractList.find(a => a.id === q.abstractId);
+      if(abs) { csBox.style.display = "block"; csBox.innerHTML = abs.text; initTabs(csBox); }
+  } else { csBox.style.display = "none"; }
+  let qTxt = clean(q.questionText);
+  question.innerHTML = qTxt;
+  if(q.submitted){
+    explanation.innerHTML=`<div class="exp-title">Explanation</div><div class="correct-exp">${formatExplanation(q.explanationText)}</div>`;
+    document.getElementById("questionResultBox").style.display = "block";
+    document.getElementById("ind-score").innerText = `${q.qScore} / ${q.qMax}`;
+    document.getElementById("ind-scoring-rule").innerText = `${q.qScore}/${q.qMax}`;
+    let qm = String(Math.floor(q.timeTaken/60)).padStart(2,'0');
+    let qs = String(q.timeTaken%60).padStart(2,'0');
+    document.getElementById("ind-time").innerText = `${qm}:${qs}`;
+    document.getElementById("ind-subject").innerText = q.subject || "General";
+    document.getElementById("ind-topic").innerText = q.topic || "General";
+  } else {
+    explanation.innerText="Explanation will appear here after clicking Check.";
+    document.getElementById("questionResultBox").style.display = "none";
+  }
+  const correct=q.submitted ? q.correctAnswer.split(",").map(x=>+x-1) : [];
+  options.innerHTML="";
+  q.answerChoiceList.forEach((c,i)=>{
+    const d=document.createElement("div");
+    d.className="option";
+    if(selected.includes(i)) d.classList.add("selected");
+    if(q.submitted){
+      if(correct.includes(i)) d.classList.add("correct");
+      if(selected.includes(i)&&!correct.includes(i)) d.classList.add("wrong");
+    }
+    d.innerHTML=c.choice;
+    d.onclick=()=>{ if(q.submitted) return; selected.includes(i)?selected=selected.filter(x=>x!==i):selected.push(i); q.userAnswer=selected; render(); };
+    options.appendChild(d);
+  });
+}
+
+function check(){
+  const q=DATA.questionList[qIndex];
+  if(!q || q.submitted) return;
+  q.submitted=true;
+  const correct=q.correctAnswer.split(",").map(x=>+x-1);
+  let cs=0,is=0;
+  selected.forEach(i=> correct.includes(i)?cs++:is++ );
+  let qPoints = Math.max(0,cs-is);
+  q.qScore = qPoints;
+  q.qMax = correct.length;
+  score += qPoints; total += correct.length;
+  updateTopBar(); render();
+}
+
+function nextQ(){ if(qIndex<DATA.questionList.length-1){ qIndex++; render(); } }
+function prevQ(){ if(qIndex>0){ qIndex--; render(); } }
+function openCalc(){ document.getElementById("calculator").style.display="block"; }
+function closeCalc(){ document.getElementById("calculator").style.display="none"; }
+let calcVal = "";
+function calcIn(v) { calcVal += v; document.getElementById("calc-display").value = calcVal; }
+function calcClear() { calcVal = ""; document.getElementById("calc-display").value = "0"; }
+function calcRes() { try { calcVal = eval(calcVal).toString(); document.getElementById("calc-display").value = calcVal; } catch(e) { document.getElementById("calc-display").value = "Error"; calcVal = ""; } }
+
+function loadFile(e){
+  const f=e.target.files[0]; if(!f) return;
+  fileName.innerText=f.name.toUpperCase();
+  const r=new FileReader();
+  r.onload=()=>{
+    DATA=JSON.parse(r.result);
+    DATA.questionList.forEach(q=>{ q.submitted=false; q.userAnswer=[]; q.timeTaken=0; });
+    qIndex=0; score=0; total=0; sec=0; questionsLoaded=true; render(); startTimer();
+  };
+  r.readAsText(f);
+}
+
+// SERVICE WORKER REGISTRATION
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('Service Worker Registered!'))
+      .catch(err => console.log('Registration failed:', err));
+  });
+}
+</script>
+
+</body>
+</html>

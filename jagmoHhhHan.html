@@ -1,131 +1,303 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>PBX-0008 NCLEX-RN</title>
+<title>PBX-0008 NCLEX-RN Mobile</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PBX-0008">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <style>
-*{ box-sizing:border-box; }
-
-body{
-  margin:0;
-  font-family: Arial, Helvetica, sans-serif;
-  background:#eef3f8;
-  overflow:hidden;
+/* --- CORE VARIABLES --- */
+:root{ 
+    --navy: #1a4f8b; /* UWorld-ish Blue */
+    --navy-light: #306fb6; 
+    --bg-gray: #f2f4f7;
+    --text-color: #333;
+    --border-color: #d1d5db;
+    --correct-green: #e6ffea;
+    --wrong-red: #ffebeb;
+    --option-selected: #e3f2fd;
+    --calc-bg: #2d2d2d;
 }
 
-:root{
-  --navy: #005b96;
-  --navy-light: #5086b3;
-  --google-blue: #1a73e8;
-  --calc-red: #8b0000;
-  --calc-blue: #004080;
-  --glass: rgba(255, 255, 255, 0.8);
+*{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+
+body{ 
+    margin:0; 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+    background: var(--bg-gray); 
+    color: var(--text-color);
+    overflow-x: hidden; 
+    /* Allow body scroll on mobile */
+    overflow-y: auto; 
+    padding-bottom: 70px; /* Space for bottom bar */
 }
 
-/* TOP BAR */
-.topbar{
-  height:44px;
-  background:var(--navy);
-  color:white;
-  padding:0 16px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  font-size:14px;
-}
-.top-left{ font-weight:bold; display: flex; align-items: center; gap: 10px;}
-
-@keyframes glarYellowRed {
-  0% { color: inherit; text-shadow: 0 0 2px rgba(255, 255, 0, 0.3); }
-  25% { color: #FFD700; text-shadow: 0 0 10px rgba(255, 255, 0, 0.8); }
-  50% { color: #FFA500; text-shadow: 0 0 15px rgba(255, 165, 0, 0.8); }
-  75% { color: #f8a98c; text-shadow: 0 0 15px rgba(255, 69, 0, 0.8); }
-  100% { color: inherit; text-shadow: 0 0 2px rgba(255, 94, 94, 0.555); }
-}
-
-.pbx-glare {
-  animation: glarYellowRed 3s ease-in-out infinite;
-  font-weight: bold;
-  display: inline-block;
-}
-.top-center{ position: absolute; left: 50%; transform: translateX(-50%); color: white; font-weight: bold; font-size: 14px; }
-
-#typewriter {
-  color: white;
-  border-right: 2px solid rgba(255,255,255,0.75);
-  white-space: nowrap;
-  overflow: hidden;
-  padding-left: 10px;
-  min-width: 120px;
-}
-.cursor-blink { animation: blink 0.7s infinite; }
-@keyframes blink { 50% { border-color: transparent; } }
-
-.calc-strip{
-  height:36px;
-  background:var(--navy-light);
-  color:white;
-  padding:0 16px;
-  display:grid;
-  grid-template-columns:1fr auto 1fr;
-  align-items:center;
-  font-size:13px;
-}
-
-.main{
-  height:calc(100vh - 44px - 36px - 44px);
-  display:grid;
-  grid-template-columns:1fr 1fr;
-}
-
-.left, .right{ overflow-y:auto; padding:24px; }
-.left{ background:white; border-right:1px solid #bacada; }
-.right{ background:#f8fafc; }
-
-.option {
-    padding: 14px 14px 14px 45px;
-    margin-bottom: 8px;
-    cursor: pointer;
-    position: relative;
-    border-radius: 4px;
-    background: white;
+/* --- HEADER --- */
+.topbar{ 
+    height: 50px; 
+    background: var(--navy); 
+    color: white; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 0 12px; 
+    position: sticky; 
+    top: 0; 
+    z-index: 1000;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    transition: 0.2s;
 }
 
-.option:hover { background: #f0f7ff; }
-.option.selected { background: #e0efff; border: 1px solid var(--navy-light); }
-.option.correct { border-left: 5px solid #1bad22; }
-.option.wrong { border-left: 5px solid #ff2828; }
+.top-left { font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 8px;}
+.top-right { font-size: 13px; display: flex; gap: 10px; align-items: center; }
+.top-right span { cursor: pointer; background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; }
 
-#questionResultBox {
-  display: none;
-  background: #fff;
-  border-left: 8px solid #ccc;
-  margin-top: 20px;
-  padding: 15px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+/* --- SUB-HEADER (File & Calc) --- */
+.calc-strip {
+    background: white;
+    border-bottom: 1px solid var(--border-color);
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+}
+.calc-btn-trigger {
+    background: var(--navy-light);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.file-upload-wrapper input { max-width: 180px; font-size: 12px; }
+
+/* --- MAIN CONTAINER --- */
+.main {
+    display: block; /* Stack vertically */
+    max-width: 800px;
+    margin: 0 auto;
+    background: var(--bg-gray);
 }
 
-.bottombar{
-  height:44px;
-  background:var(--navy);
-  padding:0 16px;
-  display:flex;
-  justify-content:flex-end;
-  align-items:center;
+/* --- QUESTION SECTION --- */
+.left {
+    padding: 16px;
+    background: white;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-button {
-  background:var(--navy-light);
-  color:white;
-  border:none;
-  padding:8px 16px;
-  margin-left:10px;
-  cursor:pointer;
-  font-weight:bold;
+/* --- CASE STUDY TABS --- */
+#caseStudyContainer { 
+    margin-bottom: 20px; 
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    overflow: hidden;
+    display: none;
+    background: #fff;
 }
+.nav-tabs { 
+    display: flex; 
+    background: #f8f9fa; 
+    border-bottom: 1px solid var(--border-color);
+    overflow-x: auto;
+}
+.nav-link { 
+    padding: 10px 15px; 
+    font-size: 13px; 
+    font-weight: 600; 
+    color: #666; 
+    border-right: 1px solid var(--border-color);
+    white-space: nowrap;
+}
+.nav-link.active { background: white; color: var(--navy); border-bottom: 2px solid var(--navy); }
+.tab-content { padding: 15px; font-size: 15px; line-height: 1.6; max-height: 250px; overflow-y: auto; }
+
+/* --- QUESTION TEXT --- */
+.qtext { 
+    font-size: 16px; 
+    line-height: 1.6; 
+    margin-bottom: 20px; 
+    color: #222; 
+    font-weight: 500;
+}
+
+/* --- OPTIONS --- */
+#options { display: flex; flex-direction: column; gap: 10px; }
+.option { 
+    background: white;
+    border: 1px solid var(--border-color) !important;
+    padding: 16px 16px 16px 45px;
+    border-radius: 8px;
+    position: relative;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1.4;
+    transition: all 0.2s;
+    box-shadow: none;
+}
+.option::before {
+    content: "";
+    width: 20px; height: 20px;
+    border: 2px solid #ccc;
+    border-radius: 50%; /* Circle for radio look */
+    position: absolute; left: 15px; top: 50%;
+    transform: translateY(-50%);
+}
+.option.selected { background: var(--option-selected) !important; border-color: var(--navy) !important; }
+.option.selected::before { border-color: var(--navy); background: var(--navy); box-shadow: inset 0 0 0 4px white; }
+
+/* Correct/Wrong Styles */
+.option.correct { background: var(--correct-green) !important; border-color: #2e7d32 !important; }
+.option.correct::before { content: "✓"; background: transparent; color: #2e7d32; border: none; font-size: 18px; font-weight: bold; text-align: center; line-height: 20px; box-shadow: none; }
+
+.option.wrong { background: var(--wrong-red) !important; border-color: #c62828 !important; }
+.option.wrong::before { content: "✕"; background: transparent; color: #c62828; border: none; font-size: 18px; font-weight: bold; text-align: center; line-height: 20px; box-shadow: none; }
+
+/* --- EXPLANATION (Originally .right) --- */
+.right {
+    padding: 0 16px 16px 16px;
+    display: none; /* Hidden until submitted */
+    background: transparent;
+}
+.right.visible { display: block; }
+
+#explanation {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    border-top: 4px solid var(--navy);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    font-size: 15px;
+    line-height: 1.6;
+}
+.exp-title { font-weight: bold; color: var(--navy); margin-bottom: 10px; font-size: 18px; }
+
+/* --- BOTTOM NAV BAR --- */
+.bottombar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 60px;
+    background: white;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    z-index: 999;
+}
+.nav-btn {
+    border: 1px solid var(--navy);
+    background: white;
+    color: var(--navy);
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 14px;
+    min-width: 90px;
+}
+.nav-btn:active { background: #f0f0f0; }
+
+.check-container { position: absolute; left: 50%; transform: translateX(-50%); }
+.check-btn-main {
+    background: var(--navy);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 16px;
+    box-shadow: 0 4px 6px rgba(0,75,150,0.3);
+}
+.check-btn-main:disabled { background: #ccc; box-shadow: none; }
+
+/* --- CALCULATOR MODAL --- */
+#calculator {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    background: var(--calc-bg);
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    z-index: 20000;
+    display: none;
+    padding-bottom: 15px;
+}
+#calc-header {
+    background: #444;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 12px 12px 0 0;
+    display: flex; justify-content: space-between; align-items: center;
+    cursor: move;
+}
+#calc-display {
+    width: 90%; margin: 15px auto;
+    height: 50px; font-size: 24px;
+    border-radius: 6px; border: none; padding: 10px;
+    text-align: right; background: #e0e0e0;
+}
+.calc-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+    padding: 0 15px;
+}
+.calc-btn {
+    padding: 15px 0; font-size: 18px; border-radius: 6px;
+    border: none; background: #666; color: white;
+}
+.calc-btn.op { background: #ff9800; color: black; font-weight: bold; }
+.calc-btn.eq { background: var(--navy-light); grid-column: span 2; }
+
+/* --- STATS BOX --- */
+#questionResultBox { 
+    background: #eef3f8; 
+    margin-top: 15px; 
+    border-radius: 8px; 
+    padding: 10px; 
+}
+.result-flex { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 8px; 
+    font-size: 11px; 
+    text-align: center;
+}
+.result-item b { display: block; font-size: 13px; margin-bottom: 2px; color: var(--navy); }
+
+/* --- AI MODAL --- */
+#aiModal {
+    position: fixed; bottom: 0; left: 0; right: 0; top: 20%;
+    background: white;
+    border-radius: 15px 15px 0 0;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
+    z-index: 30000;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    display: flex; flex-direction: column;
+}
+#aiModal.active { transform: translateY(0); }
+.ai-header { padding: 12px; background: var(--navy); color: white; display: flex; justify-content: space-between; border-radius: 15px 15px 0 0; }
+.ai-body { flex: 1; padding: 0; overflow: hidden; position: relative; }
+.ai-body iframe { width: 100%; height: 100%; border: none; }
+
+/* Utility */
+.blue-search { color: var(--navy-light); text-decoration: underline; font-weight: bold; }
+.opt-gap { font-weight: bold; color: var(--navy); }
+
+/* Glare Animation for PBX branding */
+@keyframes glareAnim { 0% { color: white; } 50% { color: #ffd700; text-shadow: 0 0 10px gold; } 100% { color: white; } }
+.pbx-glare { animation: glareAnim 3s infinite; }
+
 </style>
 </head>
 
@@ -133,174 +305,329 @@ button {
 
 <div class="topbar">
   <div class="top-left">
-    <span class="pbx-glare">PBX-0008</span> NCLEX-RN
-    <div id="typewriter" class="cursor-blink"></div>
+    <span class="pbx-glare">PBX</span> RN
+    <span id="qidDisplay" style="font-weight:normal; margin-left:10px; opacity:0.8; font-size:12px;">QID: ----</span>
   </div>
-  <div class="top-center" id="qidDisplay">QID. ----</div>
   <div class="top-right">
-    <span id="scoreBox">Score: 0 / 0 (0%)</span>
-    <span id="timeBox" style="margin-left:15px;">Time: 00:00</span>
+    <span id="timeBox" onclick="toggleTime()">00:00</span>
+    <span id="scoreBox" onclick="toggleScore()">0%</span>
   </div>
 </div>
 
 <div class="calc-strip">
-  <div class="calc-left">Calculator</div>
-  <div class="calc-center"><span class="pbx-glare">PBX-0008</span> SYSTEM</div>
-  <div class="calc-right" id="rightStrip">
-    <input type="file" id="fileInput" accept=".txt,.json" onchange="loadFile(event)">
+    <div class="calc-btn-trigger" onclick="openCalc()">
+        <span>🧮</span> Calc
+    </div>
+    <div class="file-upload-wrapper">
+        <input type="file" accept=".txt,.json" onchange="loadFile(event)">
+    </div>
+</div>
+
+<div id="aiModal">
+  <div class="ai-header">
+    <span>🤖 PBX Assistant</span>
+    <span onclick="closeAI()" style="cursor:pointer; font-size: 20px;">&times;</span>
+  </div>
+  <div class="ai-body">
+    <div id="aiLoader" style="position:absolute; top:40%; left:50%; transform:translate(-50%, -50%); display:none;">
+        Loading...
+    </div>
+    <iframe id="aiFrame" src=""></iframe>
   </div>
 </div>
 
 <div class="main">
+  
   <div class="left">
     <div id="caseStudyContainer"></div>
-    <div class="qtext" id="question" style="font-size:18px; margin-bottom:20px; font-weight:bold;">
-        Please upload a .json or .txt file to begin the session.
-    </div>
-    <div id="options"></div>
-    <div class="check-btn" style="margin-top:20px;"><button onclick="check()">Check Answer</button></div>
     
-    <div id="questionResultBox">
-        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; text-align:center;">
-            <div><b id="ind-score">0/0</b><br><small>SCORE</small></div>
-            <div><b id="ind-subject">General</b><br><small>SUBJECT</small></div>
-            <div><b id="ind-topic">General</b><br><small>TOPIC</small></div>
+    <div class="qtext" id="question">
+        <div style="text-align:center; padding: 40px; color:#888;">
+            <h3>Welcome to PBX-0008 Mobile</h3>
+            <p>Please upload a question file (.txt/.json) to begin.</p>
+        </div>
+    </div>
+    
+    <div id="options"></div>
+
+    <div id="questionResultBox" style="display:none;">
+        <div class="result-flex">
+            <div class="result-item"><b id="ind-score">0/0</b>SCORE</div>
+            <div class="result-item"><b id="ind-time">00:00</b>TIME</div>
+            <div class="result-item"><b id="ind-subject">Gen</b>SUBJ</div>
+            <div class="result-item"><b id="ind-topic">Gen</b>TOPIC</div>
         </div>
     </div>
   </div>
-  <div class="right">
-    <div id="explanation" style="line-height:1.6;">Explanation will appear here after checking the answer.</div>
+
+  <div class="right" id="explanationContainer">
+    <div id="explanation"></div>
   </div>
+
 </div>
 
 <div class="bottombar">
-  <button onclick="prevQ()">◀ Previous</button>
-  <button onclick="nextQ()">Next ▶</button>
+  <button class="nav-btn" onclick="prevQ()">❮ Prev</button>
+  
+  <div class="check-container">
+      <button class="check-btn-main" onclick="check()" id="btnCheck">Submit</button>
+  </div>
+  
+  <button class="nav-btn" onclick="nextQ()">Next ❯</button>
+</div>
+
+<div id="calculator">
+  <div id="calc-header"><span>Calculator</span><span onclick="closeCalc()" style="cursor:pointer">✖</span></div>
+  <input type="text" id="calc-display" disabled value="0">
+  <div class="calc-grid">
+    <button class="calc-btn" onclick="calcClear()">C</button>
+    <button class="calc-btn op" onclick="calcIn('/')">÷</button>
+    <button class="calc-btn op" onclick="calcIn('*')">×</button>
+    <button class="calc-btn op" onclick="calcIn('-')">−</button>
+    <button class="calc-btn" onclick="calcIn('7')">7</button>
+    <button class="calc-btn" onclick="calcIn('8')">8</button>
+    <button class="calc-btn" onclick="calcIn('9')">9</button>
+    <button class="calc-btn op" onclick="calcIn('+')">+</button>
+    <button class="calc-btn" onclick="calcIn('4')">4</button>
+    <button class="calc-btn" onclick="calcIn('5')">5</button>
+    <button class="calc-btn" onclick="calcIn('6')">6</button>
+    <button class="calc-btn" onclick="calcIn('.')">.</button>
+    <button class="calc-btn" onclick="calcIn('1')">1</button>
+    <button class="calc-btn" onclick="calcIn('2')">2</button>
+    <button class="calc-btn" onclick="calcIn('3')">3</button>
+    <button class="calc-btn" onclick="calcIn('0')">0</button>
+    <button class="calc-btn eq" onclick="calcRes()">=</button>
+  </div>
 </div>
 
 <script>
-let DATA = { questionList: [] };
-let qIndex = 0, selected = [], score = 0, total = 0, sec = 0;
-let timer = null, questionsLoaded = false;
+/* ================= LOGIC SECTION ================= */
 
-function loadFile(e) {
-  const f = e.target.files[0];
-  if (!f) return;
+let DATA={questionList:[]};
+let qIndex=0, selected=[], score=0, total=0, sec=0;
+let timer=null, questionsLoaded=false;
+let showScore=true, showTime=true;
 
-  const r = new FileReader();
-  r.onload = () => {
+function aiSearch(term) {
+  const modal = document.getElementById("aiModal");
+  const loader = document.getElementById("aiLoader");
+  const frame = document.getElementById("aiFrame");
+  modal.classList.add("active");
+  loader.style.display = "block";
+  frame.style.opacity = "0";
+  // Using a mobile-friendly search URL
+  const prompt = `NCLEX definition key points ${term}`;
+  frame.src = `https://www.google.com/search?q=${encodeURIComponent(prompt)}&igu=1`;
+  frame.onload = () => { loader.style.display = "none"; frame.style.opacity = "1"; };
+}
+function closeAI() { document.getElementById("aiModal").classList.remove("active"); }
+
+function clean(t){ return t ?? ""; }
+
+function formatExplanation(t){
+  if(!t) return "";
+  let text = t.replace(/\((Option|Options)[^)]+\)/gi, m => `<span class="opt-gap"><b>${m}</b></span>`);
+  text = text.replace(/<a[^>]*>(.*?)<\/a>/gi, (match, p1) => { return `<span class="blue-search" onclick="aiSearch('${p1}')">${p1}</span>`; });
+  return text;
+}
+
+function startTimer(){ 
+    if(timer || !questionsLoaded) return; 
+    timer=setInterval(()=>{ 
+        sec++; 
+        if(DATA.questionList[qIndex] && !DATA.questionList[qIndex].submitted) {
+            DATA.questionList[qIndex].timeTaken = (DATA.questionList[qIndex].timeTaken || 0) + 1;
+        }
+        updateTopBar(); 
+    },1000); 
+}
+
+function updateTopBar(){
+  let p=total?Math.round((score/total)*100):0;
+  let m=String(Math.floor(sec/60)).padStart(2,'0');
+  let s=String(sec%60).padStart(2,'0');
+  document.getElementById("scoreBox").innerText=showScore?`${p}%`:"--";
+  document.getElementById("timeBox").innerText=showTime?`${m}:${s}`:"--:--";
+}
+
+function toggleScore(){ showScore=!showScore; updateTopBar(); }
+function toggleTime(){ showTime=!showTime; updateTopBar(); }
+
+function initTabs(container) {
+  const links = container.querySelectorAll('.nav-link');
+  links.forEach(link => {
+    link.onclick = (e) => {
+      e.preventDefault();
+      container.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      container.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      link.classList.add('active');
+      const targetId = link.getAttribute('data-target').replace('#', '');
+      const target = container.querySelector(`#${targetId}`);
+      if(target) target.classList.add('active');
+    }
+  });
+}
+
+function render(){
+  if(!DATA.questionList.length) return;
+  const q=DATA.questionList[qIndex];
+  selected=q.userAnswer||[];
+  
+  // Update QID
+  document.getElementById("qidDisplay").innerText = `ID: ${q.questionId || (qIndex+1)}`;
+  
+  // Case Study Handling
+  const csBox = document.getElementById("caseStudyContainer");
+  if(q.abstractId > 0 && DATA.abstractList) {
+      const abs = DATA.abstractList.find(a => a.id === q.abstractId);
+      if(abs) { 
+          csBox.style.display = "block"; 
+          csBox.innerHTML = abs.text; 
+          initTabs(csBox); 
+      }
+  } else { csBox.style.display = "none"; }
+  
+  // Question Text
+  document.getElementById("question").innerHTML = clean(q.questionText);
+  
+  // Explanation Logic
+  const expContainer = document.getElementById("explanationContainer");
+  const expDiv = document.getElementById("explanation");
+  const checkBtn = document.getElementById("btnCheck");
+  
+  if(q.submitted){
+    expContainer.classList.add("visible");
+    expDiv.innerHTML=`<div class="exp-title">Explanation</div><div class="correct-exp">${formatExplanation(q.explanationText)}</div>`;
+    
+    // Show stats
+    document.getElementById("questionResultBox").style.display = "block";
+    document.getElementById("ind-score").innerText = `${q.qScore}/${q.qMax}`;
+    let qm = String(Math.floor(q.timeTaken/60)).padStart(2,'0');
+    let qs = String(q.timeTaken%60).padStart(2,'0');
+    document.getElementById("ind-time").innerText = `${qm}:${qs}`;
+    document.getElementById("ind-subject").innerText = (q.subject || "N/A").substring(0,8);
+    document.getElementById("ind-topic").innerText = (q.topic || "N/A").substring(0,8);
+    
+    checkBtn.innerText = "Done";
+    checkBtn.disabled = true;
+    checkBtn.style.opacity = "0.5";
+  } else {
+    expContainer.classList.remove("visible");
+    expDiv.innerText="";
+    document.getElementById("questionResultBox").style.display = "none";
+    
+    checkBtn.innerText = "Submit";
+    checkBtn.disabled = false;
+    checkBtn.style.opacity = "1";
+  }
+  
+  // Options Rendering
+  const correct=q.submitted ? q.correctAnswer.split(",").map(x=>+x-1) : [];
+  const optsDiv = document.getElementById("options");
+  optsDiv.innerHTML="";
+  
+  q.answerChoiceList.forEach((c,i)=>{
+    const d=document.createElement("div");
+    d.className="option";
+    
+    // Add letters A, B, C etc if desired, or just keep pure text
+    // d.innerHTML = `<b>${String.fromCharCode(65+i)}.</b> ${c.choice}`;
+    d.innerHTML = c.choice;
+
+    if(selected.includes(i)) d.classList.add("selected");
+    
+    if(q.submitted){
+      if(correct.includes(i)) d.classList.add("correct");
+      if(selected.includes(i) && !correct.includes(i)) d.classList.add("wrong");
+      d.onclick = null; // Disable clicking after submit
+    } else {
+      d.onclick=()=>{ 
+         // Toggle logic for Multiple Response vs Single
+         // For now, assuming standard toggle behavior
+         if(selected.includes(i)) selected=selected.filter(x=>x!==i); 
+         else selected.push(i); 
+         q.userAnswer=selected; 
+         // Re-render only options to save performance? For now full render is fine.
+         render(); 
+      };
+    }
+    optsDiv.appendChild(d);
+  });
+  
+  // Scroll to top
+  window.scrollTo(0,0);
+}
+
+function check(){
+  const q=DATA.questionList[qIndex];
+  if(!q || q.submitted) return;
+  if(selected.length === 0) { alert("Please select an answer."); return; }
+  
+  q.submitted=true;
+  const correct=q.correctAnswer.split(",").map(x=>+x-1);
+  let cs=0,is=0;
+  selected.forEach(i=> correct.includes(i)?cs++:is++ );
+  let qPoints = Math.max(0,cs-is); // Simple scoring
+  q.qScore = qPoints;
+  q.qMax = correct.length;
+  score += qPoints; total += correct.length;
+  updateTopBar(); 
+  render();
+  
+  // Auto scroll to explanation
+  setTimeout(() => {
+     document.getElementById("questionResultBox").scrollIntoView({ behavior: 'smooth' });
+  }, 100);
+}
+
+function nextQ(){ if(qIndex<DATA.questionList.length-1){ qIndex++; render(); } }
+function prevQ(){ if(qIndex>0){ qIndex--; render(); } }
+
+/* Calculator Logic */
+function openCalc(){ document.getElementById("calculator").style.display="block"; }
+function closeCalc(){ document.getElementById("calculator").style.display="none"; }
+let calcVal = "";
+function calcIn(v) { calcVal += v; document.getElementById("calc-display").value = calcVal; }
+function calcClear() { calcVal = ""; document.getElementById("calc-display").value = "0"; }
+function calcRes() { try { calcVal = eval(calcVal).toString(); document.getElementById("calc-display").value = calcVal; } catch(e) { document.getElementById("calc-display").value = "Error"; calcVal = ""; } }
+
+// Make Calc Draggable (Desktop mainly, but helpful)
+const calcEl = document.getElementById("calculator");
+const header = document.getElementById("calc-header");
+let isDragging = false, startX, startY, initLeft, initTop;
+
+header.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    startX = e.clientX; startY = e.clientY;
+    const rect = calcEl.getBoundingClientRect();
+    initLeft = rect.left; initTop = rect.top;
+});
+window.addEventListener('mousemove', (e) => {
+    if(!isDragging) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    calcEl.style.left = (initLeft + dx + 150) + "px"; // +150 to offset transform
+    calcEl.style.top = (initTop + dy + 200) + "px";
+});
+window.addEventListener('mouseup', () => isDragging = false);
+
+/* File Loading */
+function loadFile(e){
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
     try {
-      const content = JSON.parse(r.result);
-      // Handle cases where JSON might be at root or inside questionList
-      DATA = content.questionList ? content : { questionList: Array.isArray(content) ? content : [content] };
-      
-      if (DATA.questionList.length === 0) throw new Error("No questions found");
-
-      DATA.questionList.forEach(q => {
-        q.submitted = false;
-        q.userAnswer = [];
-        q.timeTaken = 0;
-      });
-
-      questionsLoaded = true;
-      qIndex = 0; score = 0; total = 0; sec = 0;
-      render();
-      startTimer();
-      alert("File loaded successfully: " + DATA.questionList.length + " questions.");
-    } catch (err) {
-      alert("Error: File is not a valid JSON format. Check console for details.");
-      console.error(err);
+        DATA=JSON.parse(r.result);
+        DATA.questionList.forEach(q=>{ q.submitted=false; q.userAnswer=[]; q.timeTaken=0; });
+        qIndex=0; score=0; total=0; sec=0; questionsLoaded=true; 
+        render(); startTimer();
+    } catch(err) {
+        alert("Invalid file format.");
     }
   };
   r.readAsText(f);
 }
 
-function render() {
-  if (!DATA.questionList.length) return;
-  const q = DATA.questionList[qIndex];
-  selected = q.userAnswer || [];
-  
-  document.getElementById("qidDisplay").innerText = `QID. ${q.questionId || "----"}`;
-  document.getElementById("rightStrip").innerHTML = `Question ${qIndex + 1} of ${DATA.questionList.length}`;
-  document.getElementById("question").innerHTML = q.questionText;
-
-  const optBox = document.getElementById("options");
-  optBox.innerHTML = "";
-
-  q.answerChoiceList.forEach((c, i) => {
-    const d = document.createElement("div");
-    d.className = "option";
-    if (selected.includes(i)) d.classList.add("selected");
-    
-    if (q.submitted) {
-      const correctArr = q.correctAnswer.split(",").map(x => parseInt(x.trim()) - 1);
-      if (correctArr.includes(i)) d.classList.add("correct");
-      if (selected.includes(i) && !correctArr.includes(i)) d.classList.add("wrong");
-    }
-
-    d.innerHTML = c.choice;
-    d.onclick = () => {
-      if (q.submitted) return;
-      if (selected.includes(i)) {
-        selected = selected.filter(x => x !== i);
-      } else {
-        selected.push(i);
-      }
-      q.userAnswer = selected;
-      render();
-    };
-    optBox.appendChild(d);
-  });
-
-  if (q.submitted) {
-    document.getElementById("explanation").innerHTML = "<h3>Explanation</h3>" + q.explanationText;
-    document.getElementById("questionResultBox").style.display = "block";
-    document.getElementById("ind-score").innerText = q.qScore + "/" + q.qMax;
-    document.getElementById("ind-subject").innerText = q.subject || "General";
-  } else {
-    document.getElementById("explanation").innerText = "Explanation will appear here after clicking Check.";
-    document.getElementById("questionResultBox").style.display = "none";
-  }
-}
-
-function check() {
-  const q = DATA.questionList[qIndex];
-  if (!q || q.submitted) return;
-
-  const correctArr = q.correctAnswer.split(",").map(x => parseInt(x.trim()) - 1);
-  let correctHits = 0, wrongHits = 0;
-
-  selected.forEach(i => correctArr.includes(i) ? correctHits++ : wrongHits++);
-  
-  q.qScore = Math.max(0, correctHits - wrongHits);
-  q.qMax = correctArr.length;
-  q.submitted = true;
-  
-  score += q.qScore;
-  total += q.qMax;
-  updateTopBar();
-  render();
-}
-
-function nextQ() { if (qIndex < DATA.questionList.length - 1) { qIndex++; render(); } }
-function prevQ() { if (qIndex > 0) { qIndex--; render(); } }
-
-function startTimer() {
-  if (timer) clearInterval(timer);
-  timer = setInterval(() => {
-    sec++;
-    updateTopBar();
-  }, 1000);
-}
-
-function updateTopBar() {
-  let p = total ? Math.round((score / total) * 100) : 0;
-  let m = String(Math.floor(sec / 60)).padStart(2, '0');
-  let s = String(sec % 60).padStart(2, '0');
-  document.getElementById("scoreBox").innerText = `Score: ${score} / ${total} (${p}%)`;
-  document.getElementById("timeBox").innerText = `Time: ${m}:${s}`;
-}
 </script>
-
 </body>
 </html>

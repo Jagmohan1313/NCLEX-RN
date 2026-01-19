@@ -15,7 +15,6 @@
     --navy-light: #306fb6; 
     --bg-gray: #f2f4f7;
     --text-color: #333;
-    --border-color: #d1d5db;
     
     /* Result Colors */
     --res-green: #d1e7dd;
@@ -46,7 +45,7 @@ body{
     overflow-x: hidden; 
     overflow-y: auto; 
     padding-bottom: 70px; 
-    padding-top: 50px; /* Space for fixed header */
+    padding-top: 50px; 
 }
 
 /* --- HEADER --- */
@@ -69,239 +68,165 @@ body{
 .top-right { font-size: 13px; display: flex; gap: 8px; align-items: center; }
 .top-right span { cursor: pointer; background: rgba(255,255,255,0.15); padding: 4px 8px; border-radius: 4px; font-weight: 600; }
 
-/* --- SLIDING SIDEBAR (Tools) --- */
+/* --- SLIDE MENU --- */
 #sideMenu {
     position: fixed; top: 50px; left: 0; bottom: 0;
-    width: 250px;
-    background: white;
+    width: 250px; background: white;
     box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-    z-index: 2000;
-    padding: 20px;
+    transform: translateX(-100%); transition: transform 0.3s ease;
+    z-index: 2000; padding: 20px;
 }
 #sideMenu.active { transform: translateX(0); }
 .menu-item {
-    padding: 15px;
-    border-bottom: 1px solid #eee;
-    font-weight: 600;
-    color: var(--navy);
-    cursor: pointer;
-    display: flex; align-items: center; gap: 10px;
+    padding: 15px; border-bottom: 1px solid #eee; font-weight: 600;
+    color: var(--navy); cursor: pointer; display: flex; align-items: center; gap: 10px;
 }
 .menu-item:active { background: #f5f5f5; }
-/* Overlay to close menu */
 #menuOverlay {
     position: fixed; top: 50px; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 1500;
-    display: none;
+    background: rgba(0,0,0,0.5); z-index: 1500; display: none;
 }
 #menuOverlay.active { display: block; }
 
 /* --- MAIN CONTAINER --- */
-.main {
-    display: block; 
-    max-width: 800px;
-    margin: 0 auto;
-}
+.main { display: block; max-width: 800px; margin: 0 auto; }
 
-/* --- QUESTION SECTION --- */
 .left {
-    padding: 12px;
-    background: white;
-    margin-bottom: 10px;
+    padding: 12px; background: white; margin-bottom: 10px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-/* --- CASE STUDY TABS --- */
+/* --- NEW CASE STUDY LAYOUT --- */
 #caseStudyContainer { 
     margin-bottom: 15px; 
-    border: 1px solid var(--border-color);
     border-radius: 6px;
-    overflow: hidden;
-    display: none;
     background: #fff;
+    display: none; /* Hidden by default */
 }
-.nav-tabs { display: flex; background: #f8f9fa; border-bottom: 1px solid var(--border-color); overflow-x: auto;}
-.nav-link { padding: 8px 12px; font-size: 12px; font-weight: 600; color: #666; border-right: 1px solid var(--border-color); white-space: nowrap;}
-.nav-link.active { background: white; color: var(--navy); border-bottom: 2px solid var(--navy); }
-.tab-content { padding: 10px; font-size: 14px; line-height: 1.5; max-height: 200px; overflow-y: auto; }
+/* The Button Strip */
+.cs-tabs-strip {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 5px 0 10px 0;
+    white-space: nowrap;
+    scrollbar-width: none; /* Firefox */
+}
+.cs-tabs-strip::-webkit-scrollbar { display: none; } /* Chrome/Safari */
 
-/* --- QUESTION TEXT --- */
+.cs-btn {
+    background: #f0f2f5;
+    color: #555;
+    border: 1px solid #ccc;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+.cs-btn.active {
+    background: var(--navy);
+    color: white;
+    border-color: var(--navy);
+    box-shadow: 0 2px 5px rgba(26, 79, 139, 0.3);
+}
+
+/* The Content Box */
+#cs-display-box {
+    background: #fafafa;
+    border: 1px solid #ddd;
+    border-left: 4px solid var(--navy);
+    padding: 12px;
+    border-radius: 4px;
+    max-height: 200px; /* Fixed height box */
+    overflow-y: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #333;
+    display: none; /* Hidden until button clicked */
+}
+#cs-display-box.active { display: block; }
+#cs-placeholder {
+    font-size: 12px; color: #888; font-style: italic; padding: 5px;
+}
+
+/* --- QUESTION & OPTIONS --- */
 .qtext { 
-    font-size: 15px; 
-    line-height: 1.5; 
-    margin-bottom: 15px; 
-    color: #111; 
-    font-weight: 500;
+    font-size: 15px; line-height: 1.5; margin-bottom: 15px; 
+    color: #111; font-weight: 500;
 }
 
-/* --- COMPACT OPTIONS --- */
 #options { display: flex; flex-direction: column; gap: 6px; }
 .option { 
-    background: white;
-    border: 1px solid #ccc !important;
-    padding: 10px 10px 10px 38px; /* Compact padding */
-    border-radius: 6px;
-    position: relative;
-    cursor: pointer;
-    font-size: 14px; /* Slightly smaller for density */
-    line-height: 1.3;
-    transition: all 0.1s;
-    min-height: 40px;
-    display: flex; align-items: center;
+    background: white; border: 1px solid #ccc !important;
+    padding: 10px 10px 10px 38px; border-radius: 6px;
+    position: relative; cursor: pointer; font-size: 14px;
+    line-height: 1.3; min-height: 40px; display: flex; align-items: center;
 }
 .option::before {
-    content: "";
-    width: 16px; height: 16px;
-    border: 2px solid #999;
-    border-radius: 50%;
-    position: absolute; left: 10px; top: 50%;
-    transform: translateY(-50%);
+    content: ""; width: 16px; height: 16px; border: 2px solid #999;
+    border-radius: 50%; position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
 }
-/* Selected State (User Click) */
 .option.selected { 
     background: var(--opt-sel-bg) !important; 
     border-color: var(--opt-sel-border) !important; 
-    color: var(--navy);
-    font-weight: 500;
+    color: var(--navy); font-weight: 500;
 }
 .option.selected::before { 
-    border-color: var(--navy); 
-    background: var(--navy); 
-    box-shadow: inset 0 0 0 3px white; 
+    border-color: var(--navy); background: var(--navy); box-shadow: inset 0 0 0 3px white; 
 }
 
-/* --- RESULT STATES (After Check) --- */
-/* User Correct */
-.option.res-correct { 
-    background: var(--correct-bg) !important; 
-    border-color: var(--correct-border) !important; 
-    color: var(--res-green-text);
-}
-.option.res-correct::before {
-    content: "✓"; background: transparent; color: var(--correct-border); 
-    border: none; font-size: 16px; font-weight: bold; line-height: 16px; box-shadow: none; text-align: center;
-}
+/* Result Colors */
+.option.res-correct { background: var(--correct-bg) !important; border-color: var(--correct-border) !important; color: var(--res-green-text); }
+.option.res-correct::before { content: "✓"; background: transparent; color: var(--correct-border); border: none; font-size: 16px; font-weight: bold; text-align: center; box-shadow: none; line-height: 16px;}
 
-/* User Wrong */
-.option.res-wrong { 
-    background: var(--wrong-bg) !important; 
-    border-color: var(--wrong-border) !important; 
-    color: var(--res-red-text);
-}
-.option.res-wrong::before {
-    content: "✕"; background: transparent; color: var(--wrong-border); 
-    border: none; font-size: 16px; font-weight: bold; line-height: 16px; box-shadow: none; text-align: center;
-}
+.option.res-wrong { background: var(--wrong-bg) !important; border-color: var(--wrong-border) !important; color: var(--res-red-text); }
+.option.res-wrong::before { content: "✕"; background: transparent; color: var(--wrong-border); border: none; font-size: 16px; font-weight: bold; text-align: center; box-shadow: none; line-height: 16px;}
 
-/* Correct but Missed */
-.option.res-missed { 
-    border: 2px solid var(--correct-border) !important; 
-    background: #fff !important;
-}
-.option.res-missed::after {
-    content: "(Correct)"; font-size: 10px; color: var(--correct-border); font-weight: bold; margin-left: 8px;
-    white-space: nowrap;
-}
+.option.res-missed { border: 2px solid var(--correct-border) !important; background: #fff !important; }
+.option.res-missed::after { content: "(Correct)"; font-size: 10px; color: var(--correct-border); font-weight: bold; margin-left: 8px; white-space: nowrap;}
 
-/* You Tag */
-.you-tag {
-    font-size: 10px; font-weight: 900; text-transform: uppercase; 
-    margin-left: 8px; padding: 2px 4px; border-radius: 3px; border: 1px solid currentColor;
-    white-space: nowrap; display: none;
-}
+.you-tag { font-size: 10px; font-weight: 900; text-transform: uppercase; margin-left: 8px; padding: 2px 4px; border-radius: 3px; border: 1px solid currentColor; white-space: nowrap; display: none; }
 .option.res-correct .you-tag, .option.res-wrong .you-tag { display: inline-block; }
 
-
-/* --- EXPLANATION --- */
-.right { padding: 0 12px 12px 12px; display: none; background: transparent; }
+/* --- EXPLANATION & FOOTER --- */
+.right { padding: 0 12px 12px 12px; display: none; }
 .right.visible { display: block; }
-#explanation {
-    background: white; padding: 15px; border-radius: 8px;
-    border-top: 4px solid var(--navy);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    font-size: 14px; line-height: 1.5;
-}
-.exp-title { font-weight: bold; color: var(--navy); margin-bottom: 8px; font-size: 16px; }
+#explanation { background: white; padding: 15px; border-radius: 8px; border-top: 4px solid var(--navy); box-shadow: 0 2px 6px rgba(0,0,0,0.1); font-size: 14px; line-height: 1.5; }
 
-/* --- BOTTOM NAV BAR --- */
-.bottombar {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    height: 60px; background: white; border-top: 1px solid #ddd;
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 0 12px; z-index: 999;
-}
-.nav-btn {
-    border: 1px solid var(--navy); background: white; color: var(--navy);
-    padding: 8px 16px; border-radius: 4px; font-weight: bold; font-size: 14px;
-    min-width: 80px;
-}
+.bottombar { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: white; border-top: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; padding: 0 12px; z-index: 999; }
+.nav-btn { border: 1px solid var(--navy); background: white; color: var(--navy); padding: 8px 16px; border-radius: 4px; font-weight: bold; font-size: 14px; min-width: 80px; }
 .check-container { position: absolute; left: 50%; transform: translateX(-50%); }
-.check-btn-main {
-    background: var(--navy); color: white; border: none;
-    padding: 10px 35px; border-radius: 25px; font-weight: bold; font-size: 16px;
-    box-shadow: 0 4px 6px rgba(0,75,150,0.3);
-}
+.check-btn-main { background: var(--navy); color: white; border: none; padding: 10px 35px; border-radius: 25px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(0,75,150,0.3); }
 .check-btn-main:disabled { background: #999; box-shadow: none; cursor: not-allowed; }
 
-/* --- CALCULATOR MODAL --- */
-#calculator {
-    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    width: 280px; background: var(--calc-bg); border-radius: 12px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 20000;
-    display: none; padding-bottom: 15px;
-}
-#calc-header {
-    background: #444; color: white; padding: 10px 15px;
-    border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center;
-}
-#calc-display {
-    width: 90%; margin: 15px auto; height: 45px; font-size: 24px;
-    border-radius: 6px; border: none; padding: 8px; text-align: right; background: #e0e0e0;
-}
+/* --- STATS BOX --- */
+#questionResultBox { margin-top: 15px; border-radius: 6px; padding: 10px; border: 1px solid transparent; }
+.theme-correct { background-color: var(--res-green); color: var(--res-green-text); border-color: var(--res-green-text); }
+.theme-wrong { background-color: var(--res-red); color: var(--res-red-text); border-color: var(--res-red-text); }
+.theme-partial { background-color: var(--res-orange); color: var(--res-orange-text); border-color: var(--res-orange-text); }
+.result-flex { display: flex; justify-content: space-around; align-items: center; font-size: 12px; text-align: center; }
+.result-item b { display: block; font-size: 14px; margin-bottom: 2px; }
+
+/* --- CALCULATOR --- */
+#calculator { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 280px; background: var(--calc-bg); border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 20000; display: none; padding-bottom: 15px; }
+#calc-header { background: #444; color: white; padding: 10px 15px; border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center; }
+#calc-display { width: 90%; margin: 15px auto; height: 45px; font-size: 24px; border-radius: 6px; border: none; padding: 8px; text-align: right; background: #e0e0e0; }
 .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 0 15px; }
 .calc-btn { padding: 12px 0; font-size: 18px; border-radius: 6px; border: none; background: #666; color: white; }
 .calc-btn.op { background: #ff9800; color: black; font-weight: bold; }
 .calc-btn.eq { background: var(--navy-light); grid-column: span 2; }
 
-/* --- STATS BOX (Themed) --- */
-#questionResultBox { 
-    margin-top: 15px; 
-    border-radius: 6px; 
-    padding: 10px; 
-    border: 1px solid transparent;
-}
-/* Themes */
-.theme-correct { background-color: var(--res-green); color: var(--res-green-text); border-color: var(--res-green-text); }
-.theme-wrong { background-color: var(--res-red); color: var(--res-red-text); border-color: var(--res-red-text); }
-.theme-partial { background-color: var(--res-orange); color: var(--res-orange-text); border-color: var(--res-orange-text); }
-
-.result-flex { 
-    display: flex; 
-    justify-content: space-around; 
-    align-items: center;
-    font-size: 12px; 
-    text-align: center;
-}
-.result-item b { display: block; font-size: 14px; margin-bottom: 2px; }
-
-/* --- AI SEARCH --- */
-#aiModal {
-    position: fixed; bottom: 0; left: 0; right: 0; top: 20%;
-    background: white; border-radius: 15px 15px 0 0;
-    box-shadow: 0 -5px 20px rgba(0,0,0,0.2); z-index: 30000;
-    transform: translateY(100%); transition: transform 0.3s ease;
-    display: flex; flex-direction: column;
-}
+/* --- AI & UTILS --- */
+#aiModal { position: fixed; bottom: 0; left: 0; right: 0; top: 20%; background: white; border-radius: 15px 15px 0 0; box-shadow: 0 -5px 20px rgba(0,0,0,0.2); z-index: 30000; transform: translateY(100%); transition: transform 0.3s ease; display: flex; flex-direction: column; }
 #aiModal.active { transform: translateY(0); }
 .ai-header { padding: 12px; background: var(--navy); color: white; display: flex; justify-content: space-between; border-radius: 15px 15px 0 0; }
 .ai-body { flex: 1; position: relative; }
 .ai-body iframe { width: 100%; height: 100%; border: none; }
 .blue-search { color: var(--navy-light); text-decoration: underline; font-weight: bold; cursor: pointer;}
 .opt-gap { font-weight: bold; color: var(--navy); }
-
 .pbx-glare { animation: glareAnim 3s infinite; }
 @keyframes glareAnim { 0% { color: white; } 50% { color: #ffd700; text-shadow: 0 0 10px gold; } 100% { color: white; } }
 
@@ -325,45 +250,29 @@ body{
 <div id="menuOverlay" onclick="toggleMenu()"></div>
 <div id="sideMenu">
     <h3 style="margin-top:0; color:#333;">Tools</h3>
-    
-    <div class="menu-item" onclick="toggleMenu(); openCalc();">
-        <span>🧮</span> Calculator
-    </div>
-    
-    <div class="menu-item" onclick="triggerFileUpload()">
-        <span>📂</span> Load File
-        <input type="file" id="fileHidden" accept=".txt,.json" onchange="loadFile(event)" style="display:none;">
-    </div>
-    
-    <div style="margin-top:30px; font-size:12px; color:#888;">
-        PBX Mobile v2.0
-    </div>
+    <div class="menu-item" onclick="toggleMenu(); openCalc();"><span>🧮</span> Calculator</div>
+    <div class="menu-item" onclick="triggerFileUpload()"><span>📂</span> Load File <input type="file" id="fileHidden" accept=".txt,.json" onchange="loadFile(event)" style="display:none;"></div>
 </div>
 
 <div id="aiModal">
-  <div class="ai-header">
-    <span>PBX Ast.</span>
-    <span onclick="closeAI()" style="cursor:pointer; font-size: 20px;">&times;</span>
-  </div>
-  <div class="ai-body">
-    <iframe id="aiFrame" src=""></iframe>
-  </div>
+  <div class="ai-header"><span>PBX Ast.</span><span onclick="closeAI()" style="cursor:pointer; font-size: 20px;">&times;</span></div>
+  <div class="ai-body"><iframe id="aiFrame" src=""></iframe></div>
 </div>
 
 <div class="main">
-  
   <div class="left">
-    <div id="caseStudyContainer"></div>
+    <div id="caseStudyContainer">
+        <div class="cs-tabs-strip" id="csTabs"></div>
+        <div id="cs-placeholder">Select a tab above to view details...</div>
+        <div id="cs-display-box"></div>
+    </div>
     
     <div class="qtext" id="question">
         <div style="text-align:center; padding: 40px; color:#888;">
-            <h3>PBX-0008 Mobile</h3>
-            <p>Load a question file from the Menu (☰).</p>
+            <h3>PBX-0008 Mobile</h3><p>Load a question file from the Menu (☰).</p>
         </div>
     </div>
-    
     <div id="options"></div>
-
     <div id="questionResultBox" style="display:none;">
         <div class="result-flex">
             <div class="result-item"><b id="ind-score">0/0</b>SCORE</div>
@@ -376,14 +285,11 @@ body{
   <div class="right" id="explanationContainer">
     <div id="explanation"></div>
   </div>
-
 </div>
 
 <div class="bottombar">
   <button class="nav-btn" onclick="prevQ()">❮ Prev</button>
-  <div class="check-container">
-      <button class="check-btn-main" onclick="check()" id="btnCheck">Submit</button>
-  </div>
+  <div class="check-container"><button class="check-btn-main" onclick="check()" id="btnCheck">Submit</button></div>
   <button class="nav-btn" onclick="nextQ()">Next ❯</button>
 </div>
 
@@ -391,61 +297,31 @@ body{
   <div id="calc-header"><span>Calculator</span><span onclick="closeCalc()" style="cursor:pointer">✖</span></div>
   <input type="text" id="calc-display" disabled value="0">
   <div class="calc-grid">
-    <button class="calc-btn" onclick="calcClear()">C</button>
-    <button class="calc-btn op" onclick="calcIn('/')">÷</button>
-    <button class="calc-btn op" onclick="calcIn('*')">×</button>
-    <button class="calc-btn op" onclick="calcIn('-')">−</button>
-    <button class="calc-btn" onclick="calcIn('7')">7</button>
-    <button class="calc-btn" onclick="calcIn('8')">8</button>
-    <button class="calc-btn" onclick="calcIn('9')">9</button>
-    <button class="calc-btn op" onclick="calcIn('+')">+</button>
-    <button class="calc-btn" onclick="calcIn('4')">4</button>
-    <button class="calc-btn" onclick="calcIn('5')">5</button>
-    <button class="calc-btn" onclick="calcIn('6')">6</button>
-    <button class="calc-btn" onclick="calcIn('.')">.</button>
-    <button class="calc-btn" onclick="calcIn('1')">1</button>
-    <button class="calc-btn" onclick="calcIn('2')">2</button>
-    <button class="calc-btn" onclick="calcIn('3')">3</button>
-    <button class="calc-btn" onclick="calcIn('0')">0</button>
-    <button class="calc-btn eq" onclick="calcRes()">=</button>
+    <button class="calc-btn" onclick="calcClear()">C</button><button class="calc-btn op" onclick="calcIn('/')">÷</button><button class="calc-btn op" onclick="calcIn('*')">×</button><button class="calc-btn op" onclick="calcIn('-')">−</button>
+    <button class="calc-btn" onclick="calcIn('7')">7</button><button class="calc-btn" onclick="calcIn('8')">8</button><button class="calc-btn" onclick="calcIn('9')">9</button><button class="calc-btn op" onclick="calcIn('+')">+</button>
+    <button class="calc-btn" onclick="calcIn('4')">4</button><button class="calc-btn" onclick="calcIn('5')">5</button><button class="calc-btn" onclick="calcIn('6')">6</button><button class="calc-btn" onclick="calcIn('.')">.</button>
+    <button class="calc-btn" onclick="calcIn('1')">1</button><button class="calc-btn" onclick="calcIn('2')">2</button><button class="calc-btn" onclick="calcIn('3')">3</button><button class="calc-btn" onclick="calcIn('0')">0</button><button class="calc-btn eq" onclick="calcRes()">=</button>
   </div>
 </div>
 
 <script>
-/* ================= LOGIC SECTION ================= */
-
-let DATA={questionList:[]};
-let qIndex=0, selected=[], score=0, total=0, sec=0;
+let DATA={questionList:[]}, qIndex=0, selected=[], score=0, total=0, sec=0;
 let timer=null, questionsLoaded=false;
 let showScore=true, showTime=true;
 
-/* Menu Logic */
+/* Menu & AI */
 function toggleMenu(){
     const menu = document.getElementById("sideMenu");
     const overlay = document.getElementById("menuOverlay");
-    if(menu.classList.contains("active")){
-        menu.classList.remove("active");
-        overlay.classList.remove("active");
-    } else {
-        menu.classList.add("active");
-        overlay.classList.add("active");
-    }
+    if(menu.classList.contains("active")){ menu.classList.remove("active"); overlay.classList.remove("active"); } 
+    else { menu.classList.add("active"); overlay.classList.add("active"); }
 }
-function triggerFileUpload(){
-    document.getElementById("fileHidden").click();
-    toggleMenu(); // Close menu
-}
-
-/* AI Logic */
+function triggerFileUpload(){ document.getElementById("fileHidden").click(); toggleMenu(); }
 function aiSearch(term) {
-  const modal = document.getElementById("aiModal");
-  const frame = document.getElementById("aiFrame");
-  modal.classList.add("active");
-  const prompt = `NCLEX nursing definition key points ${term}`;
-  frame.src = `https://www.google.com/search?q=${encodeURIComponent(prompt)}&igu=1`;
+  document.getElementById("aiModal").classList.add("active");
+  document.getElementById("aiFrame").src = `https://www.google.com/search?q=${encodeURIComponent("NCLEX definition "+term)}&igu=1`;
 }
 function closeAI() { document.getElementById("aiModal").classList.remove("active"); }
-
 function clean(t){ return t ?? ""; }
 
 function formatExplanation(t){
@@ -459,37 +335,72 @@ function startTimer(){
     if(timer || !questionsLoaded) return; 
     timer=setInterval(()=>{ 
         sec++; 
-        if(DATA.questionList[qIndex] && !DATA.questionList[qIndex].submitted) {
-            DATA.questionList[qIndex].timeTaken = (DATA.questionList[qIndex].timeTaken || 0) + 1;
-        }
+        if(DATA.questionList[qIndex] && !DATA.questionList[qIndex].submitted) DATA.questionList[qIndex].timeTaken = (DATA.questionList[qIndex].timeTaken || 0) + 1;
         updateTopBar(); 
     },1000); 
 }
 
 function updateTopBar(){
   let p=total?Math.round((score/total)*100):0;
-  let m=String(Math.floor(sec/60)).padStart(2,'0');
-  let s=String(sec%60).padStart(2,'0');
   document.getElementById("scoreBox").innerText=showScore?`${p}%`:"--";
-  document.getElementById("timeBox").innerText=showTime?`${m}:${s}`:"--:--";
+  document.getElementById("timeBox").innerText=showTime?`${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`:"--:--";
 }
-
 function toggleScore(){ showScore=!showScore; updateTopBar(); }
 function toggleTime(){ showTime=!showTime; updateTopBar(); }
 
-function initTabs(container) {
-  const links = container.querySelectorAll('.nav-link');
-  links.forEach(link => {
-    link.onclick = (e) => {
-      e.preventDefault();
-      container.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-      container.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-      link.classList.add('active');
-      const targetId = link.getAttribute('data-target').replace('#', '');
-      const target = container.querySelector(`#${targetId}`);
-      if(target) target.classList.add('active');
-    }
-  });
+/* --- NEW CASE STUDY LOGIC --- */
+function renderCaseStudy(html) {
+    const container = document.getElementById("caseStudyContainer");
+    const tabsStrip = document.getElementById("csTabs");
+    const displayBox = document.getElementById("cs-display-box");
+    const placeholder = document.getElementById("cs-placeholder");
+    
+    container.style.display = "block";
+    tabsStrip.innerHTML = "";
+    displayBox.innerHTML = "";
+    displayBox.classList.remove("active");
+    placeholder.style.display = "block";
+
+    // Create a temporary element to parse the HTML string
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = html;
+
+    // Find tabs and content
+    const navLinks = tempDiv.querySelectorAll(".nav-link");
+    const tabPanes = tempDiv.querySelectorAll(".tab-pane");
+
+    // Convert them to our new buttons
+    navLinks.forEach((link, index) => {
+        const btn = document.createElement("div");
+        btn.className = "cs-btn";
+        btn.innerText = link.innerText; // Get button name (e.g. "Vitals")
+        
+        // Find corresponding content
+        const targetId = link.getAttribute("data-target") || link.getAttribute("href");
+        let contentHtml = "";
+        
+        if(targetId) {
+            const cleanId = targetId.replace("#","");
+            const pane = tempDiv.querySelector(`#${cleanId}`);
+            if(pane) contentHtml = pane.innerHTML;
+        } else if (tabPanes[index]) {
+            contentHtml = tabPanes[index].innerHTML;
+        }
+
+        // Click Event
+        btn.onclick = () => {
+            // Remove active from all buttons
+            document.querySelectorAll(".cs-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            
+            // Show content in the Box
+            displayBox.innerHTML = contentHtml;
+            displayBox.classList.add("active");
+            placeholder.style.display = "none";
+        };
+        
+        tabsStrip.appendChild(btn);
+    });
 }
 
 function render(){
@@ -499,21 +410,15 @@ function render(){
   
   document.getElementById("qidDisplay").innerText = `QID:${q.questionId || (qIndex+1)}`;
   
-  // Case Study
-  const csBox = document.getElementById("caseStudyContainer");
+  // Case Study Handling
   if(q.abstractId > 0 && DATA.abstractList) {
       const abs = DATA.abstractList.find(a => a.id === q.abstractId);
-      if(abs) { 
-          csBox.style.display = "block"; 
-          csBox.innerHTML = abs.text; 
-          initTabs(csBox); 
-      }
-  } else { csBox.style.display = "none"; }
+      if(abs) renderCaseStudy(abs.text);
+      else document.getElementById("caseStudyContainer").style.display = "none";
+  } else { document.getElementById("caseStudyContainer").style.display = "none"; }
   
-  // Question
   document.getElementById("question").innerHTML = clean(q.questionText);
   
-  // Explanation & Result
   const expContainer = document.getElementById("explanationContainer");
   const expDiv = document.getElementById("explanation");
   const checkBtn = document.getElementById("btnCheck");
@@ -522,37 +427,20 @@ function render(){
   if(q.submitted){
     expContainer.classList.add("visible");
     expDiv.innerHTML=`<div class="exp-title">Explanation</div><div class="correct-exp">${formatExplanation(q.explanationText)}</div>`;
-    
-    // Result Box Logic
     resBox.style.display = "block";
-    
-    // Determine Theme
     resBox.classList.remove("theme-correct", "theme-wrong", "theme-partial");
     if(q.qScore === q.qMax && q.qMax > 0) resBox.classList.add("theme-correct");
     else if(q.qScore === 0) resBox.classList.add("theme-wrong");
     else resBox.classList.add("theme-partial");
-
     document.getElementById("ind-score").innerText = `${q.qScore}/${q.qMax}`;
-    let qm = String(Math.floor(q.timeTaken/60)).padStart(2,'0');
-    let qs = String(q.timeTaken%60).padStart(2,'0');
-    document.getElementById("ind-time").innerText = `${qm}:${qs}`;
-    // Removed SUB, just topic
+    document.getElementById("ind-time").innerText = `${String(Math.floor(q.timeTaken/60)).padStart(2,'0')}:${String(q.timeTaken%60).padStart(2,'0')}`;
     document.getElementById("ind-topic").innerText = (q.topic || "N/A").substring(0,10);
-    
-    checkBtn.innerText = "Done";
-    checkBtn.disabled = true;
-    checkBtn.style.opacity = "0.6";
+    checkBtn.innerText = "Done"; checkBtn.disabled = true; checkBtn.style.opacity = "0.6";
   } else {
-    expContainer.classList.remove("visible");
-    expDiv.innerText="";
-    resBox.style.display = "none";
-    
-    checkBtn.innerText = "Submit";
-    checkBtn.disabled = false;
-    checkBtn.style.opacity = "1";
+    expContainer.classList.remove("visible"); expDiv.innerText=""; resBox.style.display = "none";
+    checkBtn.innerText = "Submit"; checkBtn.disabled = false; checkBtn.style.opacity = "1";
   }
   
-  // Options
   const correct = q.submitted ? q.correctAnswer.split(",").map(x=>+x-1) : [];
   const optsDiv = document.getElementById("options");
   optsDiv.innerHTML="";
@@ -560,41 +448,23 @@ function render(){
   q.answerChoiceList.forEach((c,i)=>{
     const d=document.createElement("div");
     d.className="option";
-    
-    // Using a span for text to allow side-by-side with icon
-    let txt = `<span>${c.choice}</span>`;
-    // Add YOU tag placeholder
-    txt += `<span class="you-tag">YOU</span>`;
+    let txt = `<span>${c.choice}</span><span class="you-tag">YOU</span>`;
     d.innerHTML = txt;
-
     if(selected.includes(i)) d.classList.add("selected");
-    
     if(q.submitted){
-      // 1. User Selected AND Correct -> Green + Check
-      if(selected.includes(i) && correct.includes(i)) {
-          d.classList.add("res-correct");
-      }
-      // 2. User Selected AND Wrong -> Red + X
-      else if(selected.includes(i) && !correct.includes(i)) {
-          d.classList.add("res-wrong");
-      }
-      // 3. Not Selected BUT Correct -> Green Outline
-      else if(!selected.includes(i) && correct.includes(i)) {
-          d.classList.add("res-missed");
-      }
-      
+      if(selected.includes(i) && correct.includes(i)) d.classList.add("res-correct");
+      else if(selected.includes(i) && !correct.includes(i)) d.classList.add("res-wrong");
+      else if(!selected.includes(i) && correct.includes(i)) d.classList.add("res-missed");
       d.onclick = null;
     } else {
       d.onclick=()=>{ 
          if(selected.includes(i)) selected=selected.filter(x=>x!==i); 
          else selected.push(i); 
-         q.userAnswer=selected; 
-         render(); 
+         q.userAnswer=selected; render(); 
       };
     }
     optsDiv.appendChild(d);
   });
-  
   window.scrollTo(0,0);
 }
 
@@ -602,27 +472,18 @@ function check(){
   const q=DATA.questionList[qIndex];
   if(!q || q.submitted) return;
   if(selected.length === 0) { alert("Please select an answer."); return; }
-  
   q.submitted=true;
   const correct=q.correctAnswer.split(",").map(x=>+x-1);
-  let cs=0,is=0;
-  selected.forEach(i=> correct.includes(i)?cs++:is++ );
+  let cs=0,is=0; selected.forEach(i=> correct.includes(i)?cs++:is++ );
   let qPoints = Math.max(0,cs-is); 
-  q.qScore = qPoints;
-  q.qMax = correct.length;
-  score += qPoints; total += correct.length;
-  updateTopBar(); 
-  render();
-  
-  setTimeout(() => {
-     document.getElementById("questionResultBox").scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, 100);
+  q.qScore = qPoints; q.qMax = correct.length; score += qPoints; total += correct.length;
+  updateTopBar(); render();
+  setTimeout(() => { document.getElementById("questionResultBox").scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
 }
 
 function nextQ(){ if(qIndex<DATA.questionList.length-1){ qIndex++; render(); } }
 function prevQ(){ if(qIndex>0){ qIndex--; render(); } }
 
-/* Calculator */
 function openCalc(){ document.getElementById("calculator").style.display="block"; }
 function closeCalc(){ document.getElementById("calculator").style.display="none"; }
 let calcVal = "";
@@ -630,43 +491,22 @@ function calcIn(v) { calcVal += v; document.getElementById("calc-display").value
 function calcClear() { calcVal = ""; document.getElementById("calc-display").value = "0"; }
 function calcRes() { try { calcVal = eval(calcVal).toString(); document.getElementById("calc-display").value = calcVal; } catch(e) { document.getElementById("calc-display").value = "Error"; calcVal = ""; } }
 
-// Draggable Calc
 const calcEl = document.getElementById("calculator");
 const header = document.getElementById("calc-header");
 let isDragging = false, startX, startY, initLeft, initTop;
-
-header.addEventListener('mousedown', (e) => {
-    isDragging = true;
-    startX = e.clientX; startY = e.clientY;
-    const rect = calcEl.getBoundingClientRect();
-    initLeft = rect.left; initTop = rect.top;
-});
-window.addEventListener('mousemove', (e) => {
-    if(!isDragging) return;
-    const dx = e.clientX - startX;
-    const dy = e.clientY - startY;
-    calcEl.style.left = (initLeft + dx + 140) + "px"; 
-    calcEl.style.top = (initTop + dy + 100) + "px";
-});
+header.addEventListener('mousedown', (e) => { isDragging = true; startX = e.clientX; startY = e.clientY; const rect = calcEl.getBoundingClientRect(); initLeft = rect.left; initTop = rect.top; });
+window.addEventListener('mousemove', (e) => { if(!isDragging) return; const dx = e.clientX - startX; const dy = e.clientY - startY; calcEl.style.left = (initLeft + dx + 140) + "px"; calcEl.style.top = (initTop + dy + 100) + "px"; });
 window.addEventListener('mouseup', () => isDragging = false);
 
-/* File Loading */
 function loadFile(e){
   const f=e.target.files[0]; if(!f) return;
   const r=new FileReader();
   r.onload=()=>{
-    try {
-        DATA=JSON.parse(r.result);
-        DATA.questionList.forEach(q=>{ q.submitted=false; q.userAnswer=[]; q.timeTaken=0; });
-        qIndex=0; score=0; total=0; sec=0; questionsLoaded=true; 
-        render(); startTimer();
-    } catch(err) {
-        alert("Invalid file format.");
-    }
+    try { DATA=JSON.parse(r.result); DATA.questionList.forEach(q=>{ q.submitted=false; q.userAnswer=[]; q.timeTaken=0; }); qIndex=0; score=0; total=0; sec=0; questionsLoaded=true; render(); startTimer(); } 
+    catch(err) { alert("Invalid file format."); }
   };
   r.readAsText(f);
 }
-
 </script>
 </body>
 </html>

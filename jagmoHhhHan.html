@@ -3,25 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <title>PBX-0008 NCLEX-RN Mobile</title>
-
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="PBX-0008">
-<link rel="apple-touch-icon" href="icon-180.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <style>
 /* --- CORE VARIABLES --- */
 :root{ 
-    --navy: #1a4f8b; /* UWorld-ish Blue */
+    --navy: #1a4f8b; 
     --navy-light: #306fb6; 
     --bg-gray: #f2f4f7;
     --text-color: #333;
     --border-color: #d1d5db;
-    --correct-green: #e6ffea;
-    --wrong-red: #ffebeb;
-    --option-selected: #e3f2fd;
+    
+    /* Result Colors */
+    --res-green: #d1e7dd;
+    --res-green-text: #0f5132;
+    --res-red: #f8d7da;
+    --res-red-text: #842029;
+    --res-orange: #fff3cd;
+    --res-orange-text: #664d03;
+
+    /* Option Colors */
+    --opt-sel-bg: #e3f2fd;
+    --opt-sel-border: #1a4f8b;
+    --correct-bg: #d4edda;
+    --correct-border: #28a745;
+    --wrong-bg: #f8d7da;
+    --wrong-border: #dc3545;
+    
     --calc-bg: #2d2d2d;
 }
 
@@ -33,9 +44,9 @@ body{
     background: var(--bg-gray); 
     color: var(--text-color);
     overflow-x: hidden; 
-    /* Allow body scroll on mobile */
     overflow-y: auto; 
-    padding-bottom: 70px; /* Space for bottom bar */
+    padding-bottom: 70px; 
+    padding-top: 50px; /* Space for fixed header */
 }
 
 /* --- HEADER --- */
@@ -47,50 +58,57 @@ body{
     justify-content: space-between; 
     align-items: center; 
     padding: 0 12px; 
-    position: sticky; 
-    top: 0; 
+    position: fixed; 
+    top: 0; left: 0; right: 0;
     z-index: 1000;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
-.top-left { font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 8px;}
-.top-right { font-size: 13px; display: flex; gap: 10px; align-items: center; }
-.top-right span { cursor: pointer; background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 4px; }
+.top-left { font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 15px;}
+.menu-icon { font-size: 20px; cursor: pointer; padding: 5px; }
+.top-right { font-size: 13px; display: flex; gap: 8px; align-items: center; }
+.top-right span { cursor: pointer; background: rgba(255,255,255,0.15); padding: 4px 8px; border-radius: 4px; font-weight: 600; }
 
-/* --- SUB-HEADER (File & Calc) --- */
-.calc-strip {
+/* --- SLIDING SIDEBAR (Tools) --- */
+#sideMenu {
+    position: fixed; top: 50px; left: 0; bottom: 0;
+    width: 250px;
     background: white;
-    border-bottom: 1px solid var(--border-color);
-    padding: 8px 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 13px;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 2000;
+    padding: 20px;
 }
-.calc-btn-trigger {
-    background: var(--navy-light);
-    color: white;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-weight: bold;
+#sideMenu.active { transform: translateX(0); }
+.menu-item {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    font-weight: 600;
+    color: var(--navy);
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
+    display: flex; align-items: center; gap: 10px;
 }
-.file-upload-wrapper input { max-width: 180px; font-size: 12px; }
+.menu-item:active { background: #f5f5f5; }
+/* Overlay to close menu */
+#menuOverlay {
+    position: fixed; top: 50px; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1500;
+    display: none;
+}
+#menuOverlay.active { display: block; }
 
 /* --- MAIN CONTAINER --- */
 .main {
-    display: block; /* Stack vertically */
+    display: block; 
     max-width: 800px;
     margin: 0 auto;
-    background: var(--bg-gray);
 }
 
 /* --- QUESTION SECTION --- */
 .left {
-    padding: 16px;
+    padding: 12px;
     background: white;
     margin-bottom: 10px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
@@ -98,205 +116,194 @@ body{
 
 /* --- CASE STUDY TABS --- */
 #caseStudyContainer { 
-    margin-bottom: 20px; 
+    margin-bottom: 15px; 
     border: 1px solid var(--border-color);
     border-radius: 6px;
     overflow: hidden;
     display: none;
     background: #fff;
 }
-.nav-tabs { 
-    display: flex; 
-    background: #f8f9fa; 
-    border-bottom: 1px solid var(--border-color);
-    overflow-x: auto;
-}
-.nav-link { 
-    padding: 10px 15px; 
-    font-size: 13px; 
-    font-weight: 600; 
-    color: #666; 
-    border-right: 1px solid var(--border-color);
-    white-space: nowrap;
-}
+.nav-tabs { display: flex; background: #f8f9fa; border-bottom: 1px solid var(--border-color); overflow-x: auto;}
+.nav-link { padding: 8px 12px; font-size: 12px; font-weight: 600; color: #666; border-right: 1px solid var(--border-color); white-space: nowrap;}
 .nav-link.active { background: white; color: var(--navy); border-bottom: 2px solid var(--navy); }
-.tab-content { padding: 15px; font-size: 15px; line-height: 1.6; max-height: 250px; overflow-y: auto; }
+.tab-content { padding: 10px; font-size: 14px; line-height: 1.5; max-height: 200px; overflow-y: auto; }
 
 /* --- QUESTION TEXT --- */
 .qtext { 
-    font-size: 16px; 
-    line-height: 1.6; 
-    margin-bottom: 20px; 
-    color: #222; 
+    font-size: 15px; 
+    line-height: 1.5; 
+    margin-bottom: 15px; 
+    color: #111; 
     font-weight: 500;
 }
 
-/* --- OPTIONS --- */
-#options { display: flex; flex-direction: column; gap: 10px; }
+/* --- COMPACT OPTIONS --- */
+#options { display: flex; flex-direction: column; gap: 6px; }
 .option { 
     background: white;
-    border: 1px solid var(--border-color) !important;
-    padding: 16px 16px 16px 45px;
-    border-radius: 8px;
+    border: 1px solid #ccc !important;
+    padding: 10px 10px 10px 38px; /* Compact padding */
+    border-radius: 6px;
     position: relative;
     cursor: pointer;
-    font-size: 15px;
-    line-height: 1.4;
-    transition: all 0.2s;
-    box-shadow: none;
+    font-size: 14px; /* Slightly smaller for density */
+    line-height: 1.3;
+    transition: all 0.1s;
+    min-height: 40px;
+    display: flex; align-items: center;
 }
 .option::before {
     content: "";
-    width: 20px; height: 20px;
-    border: 2px solid #ccc;
-    border-radius: 50%; /* Circle for radio look */
-    position: absolute; left: 15px; top: 50%;
+    width: 16px; height: 16px;
+    border: 2px solid #999;
+    border-radius: 50%;
+    position: absolute; left: 10px; top: 50%;
     transform: translateY(-50%);
 }
-.option.selected { background: var(--option-selected) !important; border-color: var(--navy) !important; }
-.option.selected::before { border-color: var(--navy); background: var(--navy); box-shadow: inset 0 0 0 4px white; }
-
-/* Correct/Wrong Styles */
-.option.correct { background: var(--correct-green) !important; border-color: #2e7d32 !important; }
-.option.correct::before { content: "✓"; background: transparent; color: #2e7d32; border: none; font-size: 18px; font-weight: bold; text-align: center; line-height: 20px; box-shadow: none; }
-
-.option.wrong { background: var(--wrong-red) !important; border-color: #c62828 !important; }
-.option.wrong::before { content: "✕"; background: transparent; color: #c62828; border: none; font-size: 18px; font-weight: bold; text-align: center; line-height: 20px; box-shadow: none; }
-
-/* --- EXPLANATION (Originally .right) --- */
-.right {
-    padding: 0 16px 16px 16px;
-    display: none; /* Hidden until submitted */
-    background: transparent;
+/* Selected State (User Click) */
+.option.selected { 
+    background: var(--opt-sel-bg) !important; 
+    border-color: var(--opt-sel-border) !important; 
+    color: var(--navy);
+    font-weight: 500;
 }
+.option.selected::before { 
+    border-color: var(--navy); 
+    background: var(--navy); 
+    box-shadow: inset 0 0 0 3px white; 
+}
+
+/* --- RESULT STATES (After Check) --- */
+/* User Correct */
+.option.res-correct { 
+    background: var(--correct-bg) !important; 
+    border-color: var(--correct-border) !important; 
+    color: var(--res-green-text);
+}
+.option.res-correct::before {
+    content: "✓"; background: transparent; color: var(--correct-border); 
+    border: none; font-size: 16px; font-weight: bold; line-height: 16px; box-shadow: none; text-align: center;
+}
+
+/* User Wrong */
+.option.res-wrong { 
+    background: var(--wrong-bg) !important; 
+    border-color: var(--wrong-border) !important; 
+    color: var(--res-red-text);
+}
+.option.res-wrong::before {
+    content: "✕"; background: transparent; color: var(--wrong-border); 
+    border: none; font-size: 16px; font-weight: bold; line-height: 16px; box-shadow: none; text-align: center;
+}
+
+/* Correct but Missed */
+.option.res-missed { 
+    border: 2px solid var(--correct-border) !important; 
+    background: #fff !important;
+}
+.option.res-missed::after {
+    content: "(Correct)"; font-size: 10px; color: var(--correct-border); font-weight: bold; margin-left: 8px;
+    white-space: nowrap;
+}
+
+/* You Tag */
+.you-tag {
+    font-size: 10px; font-weight: 900; text-transform: uppercase; 
+    margin-left: 8px; padding: 2px 4px; border-radius: 3px; border: 1px solid currentColor;
+    white-space: nowrap; display: none;
+}
+.option.res-correct .you-tag, .option.res-wrong .you-tag { display: inline-block; }
+
+
+/* --- EXPLANATION --- */
+.right { padding: 0 12px 12px 12px; display: none; background: transparent; }
 .right.visible { display: block; }
-
 #explanation {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
+    background: white; padding: 15px; border-radius: 8px;
     border-top: 4px solid var(--navy);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    font-size: 15px;
-    line-height: 1.6;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    font-size: 14px; line-height: 1.5;
 }
-.exp-title { font-weight: bold; color: var(--navy); margin-bottom: 10px; font-size: 18px; }
+.exp-title { font-weight: bold; color: var(--navy); margin-bottom: 8px; font-size: 16px; }
 
 /* --- BOTTOM NAV BAR --- */
 .bottombar {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    height: 60px;
-    background: white;
-    border-top: 1px solid #ddd;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 16px;
-    z-index: 999;
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: 60px; background: white; border-top: 1px solid #ddd;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 12px; z-index: 999;
 }
 .nav-btn {
-    border: 1px solid var(--navy);
-    background: white;
-    color: var(--navy);
-    padding: 10px 20px;
-    border-radius: 4px;
-    font-weight: bold;
-    font-size: 14px;
-    min-width: 90px;
+    border: 1px solid var(--navy); background: white; color: var(--navy);
+    padding: 8px 16px; border-radius: 4px; font-weight: bold; font-size: 14px;
+    min-width: 80px;
 }
-.nav-btn:active { background: #f0f0f0; }
-
 .check-container { position: absolute; left: 50%; transform: translateX(-50%); }
 .check-btn-main {
-    background: var(--navy);
-    color: white;
-    border: none;
-    padding: 12px 30px;
-    border-radius: 25px;
-    font-weight: bold;
-    font-size: 16px;
+    background: var(--navy); color: white; border: none;
+    padding: 10px 35px; border-radius: 25px; font-weight: bold; font-size: 16px;
     box-shadow: 0 4px 6px rgba(0,75,150,0.3);
 }
-.check-btn-main:disabled { background: #ccc; box-shadow: none; }
+.check-btn-main:disabled { background: #999; box-shadow: none; cursor: not-allowed; }
 
 /* --- CALCULATOR MODAL --- */
 #calculator {
-    position: fixed;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 300px;
-    background: var(--calc-bg);
-    border-radius: 12px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    z-index: 20000;
-    display: none;
-    padding-bottom: 15px;
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 280px; background: var(--calc-bg); border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 20000;
+    display: none; padding-bottom: 15px;
 }
 #calc-header {
-    background: #444;
-    color: white;
-    padding: 10px 15px;
-    border-radius: 12px 12px 0 0;
-    display: flex; justify-content: space-between; align-items: center;
-    cursor: move;
+    background: #444; color: white; padding: 10px 15px;
+    border-radius: 12px 12px 0 0; display: flex; justify-content: space-between; align-items: center;
 }
 #calc-display {
-    width: 90%; margin: 15px auto;
-    height: 50px; font-size: 24px;
-    border-radius: 6px; border: none; padding: 10px;
-    text-align: right; background: #e0e0e0;
+    width: 90%; margin: 15px auto; height: 45px; font-size: 24px;
+    border-radius: 6px; border: none; padding: 8px; text-align: right; background: #e0e0e0;
 }
-.calc-grid {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
-    padding: 0 15px;
-}
-.calc-btn {
-    padding: 15px 0; font-size: 18px; border-radius: 6px;
-    border: none; background: #666; color: white;
-}
+.calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 0 15px; }
+.calc-btn { padding: 12px 0; font-size: 18px; border-radius: 6px; border: none; background: #666; color: white; }
 .calc-btn.op { background: #ff9800; color: black; font-weight: bold; }
 .calc-btn.eq { background: var(--navy-light); grid-column: span 2; }
 
-/* --- STATS BOX --- */
+/* --- STATS BOX (Themed) --- */
 #questionResultBox { 
-    background: #eef3f8; 
     margin-top: 15px; 
-    border-radius: 8px; 
+    border-radius: 6px; 
     padding: 10px; 
+    border: 1px solid transparent;
 }
+/* Themes */
+.theme-correct { background-color: var(--res-green); color: var(--res-green-text); border-color: var(--res-green-text); }
+.theme-wrong { background-color: var(--res-red); color: var(--res-red-text); border-color: var(--res-red-text); }
+.theme-partial { background-color: var(--res-orange); color: var(--res-orange-text); border-color: var(--res-orange-text); }
+
 .result-flex { 
-    display: grid; 
-    grid-template-columns: repeat(3, 1fr); 
-    gap: 8px; 
-    font-size: 11px; 
+    display: flex; 
+    justify-content: space-around; 
+    align-items: center;
+    font-size: 12px; 
     text-align: center;
 }
-.result-item b { display: block; font-size: 13px; margin-bottom: 2px; color: var(--navy); }
+.result-item b { display: block; font-size: 14px; margin-bottom: 2px; }
 
-/* --- AI MODAL --- */
+/* --- AI SEARCH --- */
 #aiModal {
     position: fixed; bottom: 0; left: 0; right: 0; top: 20%;
-    background: white;
-    border-radius: 15px 15px 0 0;
-    box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
-    z-index: 30000;
-    transform: translateY(100%);
-    transition: transform 0.3s ease;
+    background: white; border-radius: 15px 15px 0 0;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.2); z-index: 30000;
+    transform: translateY(100%); transition: transform 0.3s ease;
     display: flex; flex-direction: column;
 }
 #aiModal.active { transform: translateY(0); }
 .ai-header { padding: 12px; background: var(--navy); color: white; display: flex; justify-content: space-between; border-radius: 15px 15px 0 0; }
-.ai-body { flex: 1; padding: 0; overflow: hidden; position: relative; }
+.ai-body { flex: 1; position: relative; }
 .ai-body iframe { width: 100%; height: 100%; border: none; }
-
-/* Utility */
-.blue-search { color: var(--navy-light); text-decoration: underline; font-weight: bold; }
+.blue-search { color: var(--navy-light); text-decoration: underline; font-weight: bold; cursor: pointer;}
 .opt-gap { font-weight: bold; color: var(--navy); }
 
-/* Glare Animation for PBX branding */
-@keyframes glareAnim { 0% { color: white; } 50% { color: #ffd700; text-shadow: 0 0 10px gold; } 100% { color: white; } }
 .pbx-glare { animation: glareAnim 3s infinite; }
+@keyframes glareAnim { 0% { color: white; } 50% { color: #ffd700; text-shadow: 0 0 10px gold; } 100% { color: white; } }
 
 </style>
 </head>
@@ -305,8 +312,9 @@ body{
 
 <div class="topbar">
   <div class="top-left">
-    <span class="pbx-glare">PBX0008</span> RN
-    <span id="qidDisplay" style="font-weight:normal; margin-left:10px; opacity:0.8; font-size:12px;">QID: ----</span>
+    <div class="menu-icon" onclick="toggleMenu()">☰</div>
+    <span class="pbx-glare">PBX0008</span> 
+    <span id="qidDisplay" style="font-weight:normal; margin-left:8px; opacity:0.8; font-size:11px;"></span>
   </div>
   <div class="top-right">
     <span id="timeBox" onclick="toggleTime()">00:00</span>
@@ -314,24 +322,30 @@ body{
   </div>
 </div>
 
-<div class="calc-strip">
-    <div class="calc-btn-trigger" onclick="openCalc()">
-        <span></span> Calc
+<div id="menuOverlay" onclick="toggleMenu()"></div>
+<div id="sideMenu">
+    <h3 style="margin-top:0; color:#333;">Tools</h3>
+    
+    <div class="menu-item" onclick="toggleMenu(); openCalc();">
+        <span>🧮</span> Calculator
     </div>
-    <div class="file-upload-wrapper">
-        <input type="file" accept=".txt,.json" onchange="loadFile(event)">
+    
+    <div class="menu-item" onclick="triggerFileUpload()">
+        <span>📂</span> Load File
+        <input type="file" id="fileHidden" accept=".txt,.json" onchange="loadFile(event)" style="display:none;">
+    </div>
+    
+    <div style="margin-top:30px; font-size:12px; color:#888;">
+        PBX Mobile v2.0
     </div>
 </div>
 
 <div id="aiModal">
   <div class="ai-header">
-    <span>PBX0008 Ast.</span>
+    <span>PBX Ast.</span>
     <span onclick="closeAI()" style="cursor:pointer; font-size: 20px;">&times;</span>
   </div>
   <div class="ai-body">
-    <div id="aiLoader" style="position:absolute; top:40%; left:50%; transform:translate(-50%, -50%); display:none;">
-        Loading...
-    </div>
     <iframe id="aiFrame" src=""></iframe>
   </div>
 </div>
@@ -344,7 +358,7 @@ body{
     <div class="qtext" id="question">
         <div style="text-align:center; padding: 40px; color:#888;">
             <h3>PBX-0008 Mobile</h3>
-            <p>by- Jagmohan Singh</p>
+            <p>Load a question file from the Menu (☰).</p>
         </div>
     </div>
     
@@ -354,7 +368,6 @@ body{
         <div class="result-flex">
             <div class="result-item"><b id="ind-score">0/0</b>SCORE</div>
             <div class="result-item"><b id="ind-time">00:00</b>TIME</div>
-            <div class="result-item"><b id="ind-subject">Gen</b>SUB</div>
             <div class="result-item"><b id="ind-topic">Gen</b>TOPIC</div>
         </div>
     </div>
@@ -368,11 +381,9 @@ body{
 
 <div class="bottombar">
   <button class="nav-btn" onclick="prevQ()">❮ Prev</button>
-  
   <div class="check-container">
       <button class="check-btn-main" onclick="check()" id="btnCheck">Submit</button>
   </div>
-  
   <button class="nav-btn" onclick="nextQ()">Next ❯</button>
 </div>
 
@@ -408,17 +419,30 @@ let qIndex=0, selected=[], score=0, total=0, sec=0;
 let timer=null, questionsLoaded=false;
 let showScore=true, showTime=true;
 
+/* Menu Logic */
+function toggleMenu(){
+    const menu = document.getElementById("sideMenu");
+    const overlay = document.getElementById("menuOverlay");
+    if(menu.classList.contains("active")){
+        menu.classList.remove("active");
+        overlay.classList.remove("active");
+    } else {
+        menu.classList.add("active");
+        overlay.classList.add("active");
+    }
+}
+function triggerFileUpload(){
+    document.getElementById("fileHidden").click();
+    toggleMenu(); // Close menu
+}
+
+/* AI Logic */
 function aiSearch(term) {
   const modal = document.getElementById("aiModal");
-  const loader = document.getElementById("aiLoader");
   const frame = document.getElementById("aiFrame");
   modal.classList.add("active");
-  loader.style.display = "block";
-  frame.style.opacity = "0";
-  // Using a mobile-friendly search URL
-  const prompt = `NCLEX definition key points ${term}`;
+  const prompt = `NCLEX nursing definition key points ${term}`;
   frame.src = `https://www.google.com/search?q=${encodeURIComponent(prompt)}&igu=1`;
-  frame.onload = () => { loader.style.display = "none"; frame.style.opacity = "1"; };
 }
 function closeAI() { document.getElementById("aiModal").classList.remove("active"); }
 
@@ -473,10 +497,9 @@ function render(){
   const q=DATA.questionList[qIndex];
   selected=q.userAnswer||[];
   
-  // Update QID
-  document.getElementById("qidDisplay").innerText = `ID: ${q.questionId || (qIndex+1)}`;
+  document.getElementById("qidDisplay").innerText = `QID:${q.questionId || (qIndex+1)}`;
   
-  // Case Study Handling
+  // Case Study
   const csBox = document.getElementById("caseStudyContainer");
   if(q.abstractId > 0 && DATA.abstractList) {
       const abs = DATA.abstractList.find(a => a.id === q.abstractId);
@@ -487,42 +510,50 @@ function render(){
       }
   } else { csBox.style.display = "none"; }
   
-  // Question Text
+  // Question
   document.getElementById("question").innerHTML = clean(q.questionText);
   
-  // Explanation Logic
+  // Explanation & Result
   const expContainer = document.getElementById("explanationContainer");
   const expDiv = document.getElementById("explanation");
   const checkBtn = document.getElementById("btnCheck");
+  const resBox = document.getElementById("questionResultBox");
   
   if(q.submitted){
     expContainer.classList.add("visible");
     expDiv.innerHTML=`<div class="exp-title">Explanation</div><div class="correct-exp">${formatExplanation(q.explanationText)}</div>`;
     
-    // Show stats
-    document.getElementById("questionResultBox").style.display = "block";
+    // Result Box Logic
+    resBox.style.display = "block";
+    
+    // Determine Theme
+    resBox.classList.remove("theme-correct", "theme-wrong", "theme-partial");
+    if(q.qScore === q.qMax && q.qMax > 0) resBox.classList.add("theme-correct");
+    else if(q.qScore === 0) resBox.classList.add("theme-wrong");
+    else resBox.classList.add("theme-partial");
+
     document.getElementById("ind-score").innerText = `${q.qScore}/${q.qMax}`;
     let qm = String(Math.floor(q.timeTaken/60)).padStart(2,'0');
     let qs = String(q.timeTaken%60).padStart(2,'0');
     document.getElementById("ind-time").innerText = `${qm}:${qs}`;
-    document.getElementById("ind-subject").innerText = (q.subject || "N/A").substring(0,8);
-    document.getElementById("ind-topic").innerText = (q.topic || "N/A").substring(0,8);
+    // Removed SUB, just topic
+    document.getElementById("ind-topic").innerText = (q.topic || "N/A").substring(0,10);
     
     checkBtn.innerText = "Done";
     checkBtn.disabled = true;
-    checkBtn.style.opacity = "0.5";
+    checkBtn.style.opacity = "0.6";
   } else {
     expContainer.classList.remove("visible");
     expDiv.innerText="";
-    document.getElementById("questionResultBox").style.display = "none";
+    resBox.style.display = "none";
     
     checkBtn.innerText = "Submit";
     checkBtn.disabled = false;
     checkBtn.style.opacity = "1";
   }
   
-  // Options Rendering
-  const correct=q.submitted ? q.correctAnswer.split(",").map(x=>+x-1) : [];
+  // Options
+  const correct = q.submitted ? q.correctAnswer.split(",").map(x=>+x-1) : [];
   const optsDiv = document.getElementById("options");
   optsDiv.innerHTML="";
   
@@ -530,31 +561,40 @@ function render(){
     const d=document.createElement("div");
     d.className="option";
     
-    // Add letters A, B, C etc if desired, or just keep pure text
-    // d.innerHTML = `<b>${String.fromCharCode(65+i)}.</b> ${c.choice}`;
-    d.innerHTML = c.choice;
+    // Using a span for text to allow side-by-side with icon
+    let txt = `<span>${c.choice}</span>`;
+    // Add YOU tag placeholder
+    txt += `<span class="you-tag">YOU</span>`;
+    d.innerHTML = txt;
 
     if(selected.includes(i)) d.classList.add("selected");
     
     if(q.submitted){
-      if(correct.includes(i)) d.classList.add("correct");
-      if(selected.includes(i) && !correct.includes(i)) d.classList.add("wrong");
-      d.onclick = null; // Disable clicking after submit
+      // 1. User Selected AND Correct -> Green + Check
+      if(selected.includes(i) && correct.includes(i)) {
+          d.classList.add("res-correct");
+      }
+      // 2. User Selected AND Wrong -> Red + X
+      else if(selected.includes(i) && !correct.includes(i)) {
+          d.classList.add("res-wrong");
+      }
+      // 3. Not Selected BUT Correct -> Green Outline
+      else if(!selected.includes(i) && correct.includes(i)) {
+          d.classList.add("res-missed");
+      }
+      
+      d.onclick = null;
     } else {
       d.onclick=()=>{ 
-         // Toggle logic for Multiple Response vs Single
-         // For now, assuming standard toggle behavior
          if(selected.includes(i)) selected=selected.filter(x=>x!==i); 
          else selected.push(i); 
          q.userAnswer=selected; 
-         // Re-render only options to save performance? For now full render is fine.
          render(); 
       };
     }
     optsDiv.appendChild(d);
   });
   
-  // Scroll to top
   window.scrollTo(0,0);
 }
 
@@ -567,23 +607,22 @@ function check(){
   const correct=q.correctAnswer.split(",").map(x=>+x-1);
   let cs=0,is=0;
   selected.forEach(i=> correct.includes(i)?cs++:is++ );
-  let qPoints = Math.max(0,cs-is); // Simple scoring
+  let qPoints = Math.max(0,cs-is); 
   q.qScore = qPoints;
   q.qMax = correct.length;
   score += qPoints; total += correct.length;
   updateTopBar(); 
   render();
   
-  // Auto scroll to explanation
   setTimeout(() => {
-     document.getElementById("questionResultBox").scrollIntoView({ behavior: 'smooth' });
+     document.getElementById("questionResultBox").scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, 100);
 }
 
 function nextQ(){ if(qIndex<DATA.questionList.length-1){ qIndex++; render(); } }
 function prevQ(){ if(qIndex>0){ qIndex--; render(); } }
 
-/* Calculator Logic */
+/* Calculator */
 function openCalc(){ document.getElementById("calculator").style.display="block"; }
 function closeCalc(){ document.getElementById("calculator").style.display="none"; }
 let calcVal = "";
@@ -591,7 +630,7 @@ function calcIn(v) { calcVal += v; document.getElementById("calc-display").value
 function calcClear() { calcVal = ""; document.getElementById("calc-display").value = "0"; }
 function calcRes() { try { calcVal = eval(calcVal).toString(); document.getElementById("calc-display").value = calcVal; } catch(e) { document.getElementById("calc-display").value = "Error"; calcVal = ""; } }
 
-// Make Calc Draggable (Desktop mainly, but helpful)
+// Draggable Calc
 const calcEl = document.getElementById("calculator");
 const header = document.getElementById("calc-header");
 let isDragging = false, startX, startY, initLeft, initTop;
@@ -606,8 +645,8 @@ window.addEventListener('mousemove', (e) => {
     if(!isDragging) return;
     const dx = e.clientX - startX;
     const dy = e.clientY - startY;
-    calcEl.style.left = (initLeft + dx + 150) + "px"; // +150 to offset transform
-    calcEl.style.top = (initTop + dy + 200) + "px";
+    calcEl.style.left = (initLeft + dx + 140) + "px"; 
+    calcEl.style.top = (initTop + dy + 100) + "px";
 });
 window.addEventListener('mouseup', () => isDragging = false);
 
